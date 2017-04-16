@@ -20,7 +20,7 @@ class SiteController extends Controller
 		$this->Install();
 		$this->layout = '//layouts/column2';
 		if(Yii::app()->user->isGuest)
-					$this->redirect(array('site/login'));
+					$this->redirect(array('login'));
 		else {
 			$model = Document::model();
 			$user = yii::app()->user->guid;
