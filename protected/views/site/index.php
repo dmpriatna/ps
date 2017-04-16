@@ -12,10 +12,10 @@ $f = count($final);
 ?>
 <div class="nav-tabs-custom">
 	<ul class="nav nav-tabs" style="display: flex; overflow-y: hidden; white-space: nowrap">
-		<li class="active"><a href="#tab_1" data-toggle="tab">Active Documents<span class="badge bg-yellow" style="margin:-10px -10px 0 10px"><?=$a?></span></a></li>
-		<li><a href="#tab_2" data-toggle="tab">Process Documents<span class="badge bg-yellow" style="margin:-10px -10px 0 10px"><?=$p?></span></a></li>
-		<li><a href="#tab_3" data-toggle="tab">Execute Tasks<span class="badge bg-yellow" style="margin:-10px -10px 0 10px"><?=$e?></span></a></li>
-		<li><a href="#tab_4" data-toggle="tab">Final Notifications<span class="badge bg-yellow" style="margin:-10px -10px 0 10px"><?=$f?></span></a></li>
+		<li class="active"><a href="#tab_1" data-toggle="tab">Active Documents<?php echo $a > 0 ? '<span class="badge bg-yellow" style="margin:-10px -10px 0 10px">'.$a.'</span>' : '' ?></a></li>
+		<li><a href="#tab_2" data-toggle="tab">Process Documents<?php echo $p > 0 ? '<span class="badge bg-yellow" style="margin:-10px -10px 0 10px">'.$p.'</span>' : '' ?></a></li>
+		<li><a href="#tab_3" data-toggle="tab">Execute Tasks<?php echo $e > 0 ? '<span class="badge bg-yellow" style="margin:-10px -10px 0 10px">'.$e.'</span>' : '' ?></a></li>
+		<li><a href="#tab_4" data-toggle="tab">Final Notifications<?php echo $f > 0 ? '<span class="badge bg-yellow" style="margin:-10px -10px 0 10px">'.$f.'</span>' : '' ?></a></li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active" id="tab_1">
