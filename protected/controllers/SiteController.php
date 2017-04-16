@@ -17,9 +17,10 @@ class SiteController extends Controller
 
 	public function actionIndex()
 	{
+		$this->Install();
 		$this->layout = '//layouts/column2';
 		if(Yii::app()->user->isGuest)
-					$this->redirect(array('login'));
+					$this->redirect(array('site/login'));
 		else {
 			$model = Document::model();
 			$user = yii::app()->user->guid;
@@ -79,11 +80,10 @@ class SiteController extends Controller
 			$user->Name = "maulana";
 			$user->Email = "islademuerta847@mail.com";
 			$user->Password = "k3y@system";
-			$user->Phone = "082319353011";
 			$user->Status = "Aktif";
 			$user->Level = "Super Admin";
 			$user->StructureId = "00000000-0000-0000-0000-000000000000";
-			if(!$user->save()) { echo "<pre>"; print_r ($user->getErrors()); echo "</pre>"; die; }
+			$user->save();
 		}
 		$model=new LoginForm;
 
@@ -112,5 +112,179 @@ class SiteController extends Controller
 	{
 		Yii::app()->user->logout();
 		$this->redirect(Yii::app()->homeUrl);
+	}
+
+	/**
+	 * Initiate the table.
+	 */
+	public function Install()
+	{
+		if (Yii::app()->db->schema->getTable("attachment", true)===null) {
+			// table does not exist
+			Yii::app()->db->createCommand("CREATE TABLE `attachment` (
+			  `Name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `Size` int(11) NOT NULL,
+			  `Type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `Content` mediumblob,
+			  `CreatedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedDate` datetime NOT NULL,
+			  `DocumentId` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `Id` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `ModifiedBy` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+			  `ModifiedDate` datetime DEFAULT NULL,
+			  `RowStatus` tinyint(1) NOT NULL,
+			  PRIMARY KEY (`Id`)
+			)")->execute();
+		} else {
+			// table exists
+		}
+		if (Yii::app()->db->schema->getTable("comment", true)===null) {
+			// table does not exist
+			Yii::app()->db->createCommand("CREATE TABLE `comment` (
+			  `Content` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `DocumentId` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `UserId` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedDate` datetime NOT NULL,
+			  `Id` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `ModifiedBy` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+			  `ModifiedDate` datetime DEFAULT NULL,
+			  `RowStatus` int(11) NOT NULL,
+			  PRIMARY KEY (`Id`)
+			)")->execute();
+		} else {
+			// table exists
+		}
+		if (Yii::app()->db->schema->getTable("document", true)===null) {
+			// table does not exist
+			Yii::app()->db->createCommand("CREATE TABLE `document` (
+			  `Code` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `DocumentName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `Priority` enum('Segera','Penting','Biasa') COLLATE utf8_unicode_ci NOT NULL,
+			  `Description` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `IdRequiredBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `RequiredBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `IdApprovedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `ApprovedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `IdExecutedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `ExecutedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `Budget` bigint(20) NOT NULL,
+			  `Realization` bigint(20) NOT NULL,
+			  `Instruction` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+			  `ApprovalData` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+			  `ApprovalStatus` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+			  `DocumentStatus` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedDate` datetime NOT NULL,
+			  `Id` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `ModifiedBy` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+			  `ModifiedDate` datetime DEFAULT NULL,
+			  `RowStatus` tinyint(1) NOT NULL,
+			  PRIMARY KEY (`Id`)
+			)")->execute();
+		} else {
+			// table exists
+		}
+		if (Yii::app()->db->schema->getTable("history", true)===null) {
+			// table does not exist
+			Yii::app()->db->createCommand("CREATE TABLE `history` (
+			  `CreatedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedDate` datetime NOT NULL,
+			  `Id` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `Predicate` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `RowStatus` tinyint(1) NOT NULL,
+			  `Subject` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  PRIMARY KEY (`Id`)
+			)")->execute();
+		} else {
+			// table exists
+		}
+		if (Yii::app()->db->schema->getTable("profile", true)===null) {
+			// table does not exist
+			Yii::app()->db->createCommand("CREATE TABLE `profile` (
+			  `Name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `PlaceAndDateOfBirth` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `Gender` enum('Pria','Wanita') COLLATE utf8_unicode_ci NOT NULL,
+			  `Phone` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `Address` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `UserId` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedDate` datetime NOT NULL,
+			  `Id` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `ModifiedBy` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+			  `ModifiedDate` datetime DEFAULT NULL,
+			  `RowStatus` tinyint(1) NOT NULL,
+			  PRIMARY KEY (`Id`)
+			)")->execute();
+		} else {
+			// table exists
+		}
+		if (Yii::app()->db->schema->getTable("role", true)===null) {
+			// table does not exist
+			Yii::app()->db->createCommand("CREATE TABLE `role` (
+			  `Code` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `Number` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `DocumentName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `Description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+			  `Priority` enum('Segera','Penting','Biasa') COLLATE utf8_unicode_ci NOT NULL,
+			  `IdRequiredBy` char(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `RequiredBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `IdApprovedBy` char(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `ApprovedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `IdExecutedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `ExecutedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedDate` datetime NOT NULL,
+			  `Id` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `ModifiedBy` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+			  `ModifiedDate` datetime DEFAULT NULL,
+			  `RowStatus` tinyint(1) NOT NULL,
+			  PRIMARY KEY (`Id`)
+			)")->execute();
+		} else {
+			// table exists
+		}
+		if (Yii::app()->db->schema->getTable("structure", true)===null) {
+			// table does not exist
+			Yii::app()->db->createCommand("CREATE TABLE `structure` (
+			  `Level` tinyint(1) NOT NULL,
+			  `IdMemberOf` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `MemberOf` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `Division` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `GroupEmployee` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedDate` datetime NOT NULL,
+			  `Id` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `ModifiedBy` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+			  `ModifiedDate` datetime DEFAULT NULL,
+			  `RowStatus` tinyint(1) NOT NULL,
+			  PRIMARY KEY (`Id`)
+			)")->execute();
+		} else {
+			// table exists
+		}
+		if (Yii::app()->db->schema->getTable("user", true)===null) {
+			// table does not exist
+			Yii::app()->db->createCommand("CREATE TABLE `user` (
+			  `Name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `Email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `Password` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+			  `UniqKey` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `Status` enum('Aktif','Tidak Aktif') COLLATE utf8_unicode_ci NOT NULL,
+			  `Level` enum('Super Admin','Admin','User') COLLATE utf8_unicode_ci NOT NULL,
+			  `StructureId` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `CreatedDate` datetime NOT NULL,
+			  `Id` char(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `ModifiedBy` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+			  `ModifiedDate` datetime DEFAULT NULL,
+			  `RowStatus` tinyint(1) NOT NULL,
+			  PRIMARY KEY (`Id`),
+			  UNIQUE KEY `Name` (`Name`),
+			  UNIQUE KEY `Email` (`Email`)
+			)")->execute();
+		} else {
+			// table exists
+		}
 	}
 }
