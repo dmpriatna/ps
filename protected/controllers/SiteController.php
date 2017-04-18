@@ -24,13 +24,24 @@ class SiteController extends Controller
 		else {
 			$model = Document::model();
 			$user = yii::app()->user->guid;
-			$active = $model->findAll(array('condition'=>'IdExecutedBy != "'.$user.'" AND DocumentStatus = "'.$user.'"'));
-			$model->unsetAttributes();
-			$process = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus NOT IN ("'.$user.'","FINAL","CANCEL")'));
-			$model->unsetAttributes();
-			$execute = $model->findAll(array('condition'=>'IdExecutedBy = "'.$user.'" AND ApprovalStatus = "Approved"'));
-			$model->unsetAttributes();
-			$final = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus = "FINAL"'));
+			$level = yii::app()->user->level;
+			if($level == "Reader"){				
+				$active = $model->findAll(array('condition'=>'ApprovalStatus IS NULL OR ApprovalStatus = "Revise"'));
+				$model->unsetAttributes();
+				$process = $model->findAll(array('condition'=>'ApprovalStatus = "Proccess"'));
+				$model->unsetAttributes();
+				$execute = $model->findAll(array('condition'=>'ApprovalStatus = "Approved"'));
+				$model->unsetAttributes();
+				$final = $model->findAll(array('condition'=>'ApprovalStatus = "Executed"'));
+			} else {
+				$active = $model->findAll(array('condition'=>'IdExecutedBy != "'.$user.'" AND DocumentStatus = "'.$user.'"'));
+				$model->unsetAttributes();
+				$process = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus NOT IN ("'.$user.'","FINAL","CANCEL")'));
+				$model->unsetAttributes();
+				$execute = $model->findAll(array('condition'=>'IdExecutedBy = "'.$user.'" AND ApprovalStatus = "Approved"'));
+				$model->unsetAttributes();
+				$final = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus = "FINAL"'));
+			}
 			$this->render('index', array('active'=>$active, 'process'=>$process, 'execute'=>$execute, 'final'=>$final));
 		}
 	}

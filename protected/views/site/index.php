@@ -9,6 +9,8 @@ $a = count($active);
 $p = count($process);
 $e = count($execute);
 $f = count($final);
+$userGuid = yii::app()->user->guid;
+$userLevel = yii::app()->user->level;
 ?>
 <div class="nav-tabs-custom">
 	<ul class="nav nav-tabs" style="display: flex; overflow-y: hidden; white-space: nowrap">
@@ -32,7 +34,7 @@ $f = count($final);
 								<th width="25%">Priority</th>
 							</tr>
 							<?php if($active != null) foreach($active as $row) {
-								$url = (yii::app()->user->guid == $row->IdRequiredBy) ? yii::app()->baseurl."/document/view/" : yii::app()->baseurl."/document/approve/";
+								$url = ($userLevel == "Reader") ? yii::app()->baseurl."/document/read/" : ($userGuid == $row->IdRequiredBy ? yii::app()->baseurl."/document/view/" : yii::app()->baseurl."/document/approve/");
 							echo ("<tr>
 								<td><a href='$url$row->Id'>$row->Code</a></td>
 								<td>$row->DocumentName</td>
@@ -62,9 +64,10 @@ $f = count($final);
 							</tr>
 							<tr>
 							<?php if($process != null) foreach($process as $row) { $uo = User::model()->findByPk($row->DocumentStatus);
+							$url2 = ($userLevel == "Reader") ? yii::app()->baseurl."/document/read/" : yii::app()->baseurl."/document/view/";
 							$raw = $uo == null ? $row->DocumentStatus : $uo->Name;
 							echo ("<tr>
-								<td><a href='".yii::app()->baseurl."/document/view/$row->Id'>$row->Code</a></td>
+								<td><a href='$url2$row->Id'>$row->Code</a></td>
 								<td>$row->DocumentName</td>
 								<td>$raw</td>
 								<td>$row->Priority</td>
@@ -93,8 +96,9 @@ $f = count($final);
 							</tr>
 							<tr>
 							<?php if($execute != null) foreach($execute as $row) {
+							$url3 = ($userLevel == "Reader") ? yii::app()->baseurl."/document/read/" : yii::app()->baseurl."/document/approve/";
 							echo ("<tr>
-								<td><a href='".yii::app()->baseurl."/document/approve/$row->Id'>$row->Code</a></td>
+								<td><a href='$url3$row->Id'>$row->Code</a></td>
 								<td>$row->DocumentName</td>
 								<td>$row->RequiredBy</td>
 								<td>$row->Priority</td>
@@ -123,8 +127,9 @@ $f = count($final);
 							</tr>
 							<tr>
 							<?php if($final != null) foreach($final as $row) {
+							$url4 = ($userLevel == "Reader") ? yii::app()->baseurl."/document/read/" : yii::app()->baseurl."/document/view/";
 							echo ("<tr>
-								<td><a href='".yii::app()->baseurl."/document/view/$row->Id'>$row->Code</a></td>
+								<td><a href='$url4$row->Id'>$row->Code</a></td>
 								<td>$row->DocumentName</td>
 								<td>$row->RequiredBy ($row->DocumentStatus)</td>
 								<td>$row->Priority</td>

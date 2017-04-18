@@ -21,6 +21,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'document-grid',
 	'dataProvider'=>$active->active(),
 	'columns'=>array(
+		'Code',
 		'DocumentName',
 		array('name'=>'UserOpen', 'value'=>'$data->RequiredBy'),
 		'CreatedDate',
@@ -49,6 +50,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'document-grid',
 	'dataProvider'=>$process->process(),
 	'columns'=>array(
+		'Code',
 		'DocumentName',
 		array('name'=>'Position Document', 'value'=>'User::model()->findByPk($data->DocumentStatus)->Name'),
 		'CreatedDate',
@@ -77,6 +79,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'document-grid',
 	'dataProvider'=>$final->search(),
 	'columns'=>array(
+		'Code',
 		'DocumentName',
 		'DocumentStatus',
 		'CreatedDate',

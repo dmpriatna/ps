@@ -26,6 +26,9 @@ class DocumentController extends Controller
 			case "User" :
 				$array = array_merge($array,array('add','create','view','update','approve'));
 			break;
+			case "Reader" :
+				$array = array_merge($array,array('read'));
+			break;
 			default :
 				$array = array_merge($array,array());
 			break;
@@ -104,7 +107,8 @@ class DocumentController extends Controller
 			if($count == count($swap)) {
 				$model->ApprovalStatus = "Approved";
 				$model->DocumentStatus = $model->IdExecutedBy;
-			}
+			} else
+				$model->ApprovalStatus = "Proccess";
 			if($model->save()) {
 				$history->Subject = $model->Id;
 				$history->Predicate = "Approval";
@@ -130,7 +134,7 @@ class DocumentController extends Controller
 			}
 		}
 		if(isset($_POST['back'])) {
-			$model->ApprovalStatus = "Revisi";
+			$model->ApprovalStatus = "Revise";
 			$model->DocumentStatus = $model->IdRequiredBy;
 			if($model->save()) {
 				$history->Subject = $model->Id;
@@ -164,6 +168,19 @@ class DocumentController extends Controller
 		$log = History::model()->findAllByAttributes(array('Subject'=>$id));
 
 		$this->render('view',array(
+			'model'=>$model,
+			'comment'=>$comment,
+			'history'=>$log,
+		));
+	}
+
+	public function actionRead($id)
+	{
+		$model=$this->loadModel($id);
+		$comment = Comment::model()->findAllByAttributes(array('DocumentId'=>$id));
+		$log = History::model()->findAllByAttributes(array('Subject'=>$id));
+
+		$this->render('read',array(
 			'model'=>$model,
 			'comment'=>$comment,
 			'history'=>$log,
