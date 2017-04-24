@@ -23,6 +23,9 @@ class ReportController extends Controller
 		$process = new Document('process');
 		$final = new Document('search');
 		$final->DocumentStatus = 'FINAL';
+		if(isset($_REQUEST['Document'])){
+			$final->attributes=$_REQUEST['Document'];
+		}
 		$this->render('index',array(
 			'active'=>$active,
 			'process'=>$process,

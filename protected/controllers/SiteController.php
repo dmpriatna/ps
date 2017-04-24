@@ -18,6 +18,7 @@ class SiteController extends Controller
 	public function actionIndex()
 	{
 		$this->Install();
+		$this->Reminder();
 		$this->layout = '//layouts/column2';
 		if(Yii::app()->user->isGuest)
 					$this->redirect(array('login'));
@@ -128,7 +129,7 @@ class SiteController extends Controller
 	/**
 	 * Initiate the table.
 	 */
-	public function Install()
+	private function Install()
 	{
 		if (Yii::app()->db->schema->getTable("attachment", true)===null) {
 			// table does not exist
@@ -297,5 +298,43 @@ class SiteController extends Controller
 		} else {
 			// table exists
 		}
+	}
+	
+	/*
+	* Reminder Realization
+	*/
+	private function Reminder()
+	{
+		$role = Role::model()->find(array('condition'=>'Code = "REMINDER"'));
+		// $code = if(explode("/", $data->Number)[1] != date('m')) {
+				// $data->Number = "0001/".date('m')."/".date('Y');
+				// $data->save();
+			// }
+		$doc = Document::model()->findAll(array('condition'=>'RowStatus = 0 AND DATE(PlanningDate) = CURRENT_DATE() + INTERVAL 1 DAY'));
+		$new = new Document;
+		if($doc != null)
+		foreach($doc as $data) {
+			$new->Budget += $data->Budget;
+			$data->RowStatus = 1;
+			$data->save();
+		}
+		$new->Code = 'REMINDER/0001/'.date('m').'/'.date('Y');
+		$new->DocumentName = 'Pengingat Pembayaran';
+		$new->SubName .= $data->Code.'; ';
+		$new->Priority = 'Penting';
+		$new->Description = 'Mengingatkan Pembayaran Untuk Keperluan Dokumen Yang Akan Jatuh Tempo';
+		$new->IdRequiredBy = '00000000-0000-0000-0000-000000000000';
+		$new->RequiredBy = 'System';
+		$new->IdApprovedBy ='00000000-0000-0000-0000-000000000000';
+		$new->ApprovedBy ='System';
+		$new->IdExecutedBy = '1E951857-08E4-BF8A-1E6E-C4BEE277897C';
+		$new->ExecutedBy = 'Ami Rahmiatin';
+		$new->PlanningDate = date('Y-m-d');
+		$new->ApprovalData = 'a:1:{s:36:"00000000-0000-0000-0000-000000000000";i:1;}';
+		$new->ApprovalStatus = 'Approved';
+		$new->DocumentStatus = '1E951857-08E4-BF8A-1E6E-C4BEE277897C';
+		$new->CreatedBy = 'System';
+		$new->RowStatus = 9;
+		$new->save();
 	}
 }

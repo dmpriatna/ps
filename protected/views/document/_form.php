@@ -26,6 +26,12 @@
 				</div>
 			</div>
 			<div class="form-group">
+				<?php echo $form->labelEx($model,'SubName',array('class'=>'col-sm-3 control-label')); ?>
+				<div class="col-sm-5">
+					<?php echo $form->textField($model,'SubName', array('class' => 'form-control', 'placeholder'=>'Sub Document Name')); ?>
+				</div>
+			</div>
+			<div class="form-group">
 				<?php echo $form->labelEx($model,'Priority',array('class'=>'col-sm-3 control-label')); ?>
 				<div class="col-sm-5">
 					<?php echo $form->textField($model,'Priority', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
@@ -100,6 +106,27 @@
 				</div>
 			</div>
 			<?php endif; ?>
+			<div class="form-group">
+				<?php echo $form->labelEx($model,'PlanningDate',array('class'=>'col-sm-3 control-label')); ?>
+				<div class="col-sm-5">
+				<?php $this->widget('zii.widgets.jui.CJuiDatePicker',array(
+					'attribute'=>'PlanningDate',
+					'model'=>$model,
+					'options'=>array(
+						'changeMonth'=>true,
+						'changeYear'=>true,
+						'dateFormat'=>'yy-mm-dd',
+					),
+					'htmlOptions'=>array(
+						'class'=>'form-control',
+						'placeholder'=>'Planning Date of Budget'
+					),
+				)); ?>
+				</div>
+				<div class="col-sm-3">
+					<?php echo $form->error($model,'PlanningDate'); ?>
+				</div>
+			</div>
 			<div class="form-group">
 				<?php echo $form->labelEx($model,'Instruction',array('class'=>'col-sm-3 control-label')); ?>
 				<div class="col-sm-5">

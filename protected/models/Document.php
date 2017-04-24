@@ -12,18 +12,18 @@ class Document extends CActiveRecord
 		return 'document';
 	}
 
-	public $Action;
+	public $Since, $Until;
 	
 	public function rules()
 	{
 		return array(
-			array('Code, DocumentName, Priority, Description, RequiredBy, ApprovedBy, ExecutedBy, Budget, DocumentStatus, CreatedBy, CreatedDate, Id, RowStatus', 'required'),
+			array('Code, DocumentName, Priority, Description, RequiredBy, ApprovedBy, ExecutedBy, Budget, PlanningDate, DocumentStatus, CreatedBy, CreatedDate, Id, RowStatus', 'required'),
 			array('Budget, Realization, RowStatus', 'numerical', 'integerOnly'=>true),
 			array('Budget', 'greaterThanZero'),
 			array('Code, DocumentName, Description, IdRequiredBy, RequiredBy, IdApprovedBy, ApprovedBy, IdExecutedBy, ExecutedBy, ApprovalStatus, DocumentStatus, CreatedBy', 'length', 'max'=>256),
 			array('Id', 'length', 'max'=>36),
 			array('Instruction', 'safe'),
-			array('Code, DocumentName, Priority, Description, IdRequiredBy, RequiredBy, ApprovedBy, ExecutedBy, Instruction, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus, DocumentStatus', 'safe', 'on'=>'search'),
+			array('Code, DocumentName, Priority, Description, IdRequiredBy, RequiredBy, ApprovedBy, ExecutedBy, Instruction, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus, DocumentStatus, Since, Until', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -38,6 +38,7 @@ class Document extends CActiveRecord
 		return array(
 			'Code' => 'Code',
 			'DocumentName' => 'Document Name',
+			'SubName' => 'Sub Name',
 			'Priority' => 'Priority',
 			'Description' => 'Description',
 			'RequiredBy' => 'Required By',
@@ -45,6 +46,8 @@ class Document extends CActiveRecord
 			'ExecutedBy' => 'Executed By',
 			'Budget' => 'Budget',
 			'Realization' => 'Realization',
+			'PlanningDate' => 'Planning Date',
+			'RealizationDate' => 'Realization Date',
 			'Instruction' => 'Instruction',
 			'ApprovalStatus' => 'Approval Status',
 			'DocumentStatus' => 'Document Status',
@@ -55,6 +58,8 @@ class Document extends CActiveRecord
 			'ModifiedDate' => 'Modified Date',
 			'RowStatus' => 'Row Status',
 			'UserOpen' => 'User Open',
+			'Since' => 'Form',
+			'Until' => 'To',
 		);
 	}
 
@@ -73,13 +78,14 @@ class Document extends CActiveRecord
 		$criteria->compare('Budget',$this->Instruction);
 		$criteria->compare('Instruction',$this->Instruction,true);
 		$criteria->compare('CreatedBy',$this->CreatedBy,true);
-		$criteria->compare('CreatedDate',$this->CreatedDate,true);
+		// $criteria->compare('CreatedDate',$this->CreatedDate,true);
 		$criteria->compare('Id',$this->Id,true);
 		$criteria->compare('ModifiedBy',$this->ModifiedBy,true);
 		$criteria->compare('ModifiedDate',$this->ModifiedDate,true);
 		$criteria->compare('RowStatus',$this->RowStatus);
 		$criteria->compare('IdRequiredBy',$this->IdRequiredBy);
 		$criteria->compare('DocumentStatus',$this->DocumentStatus);
+		$criteria->addBetweenCondition('CreatedDate', $this->Since, $this->Until);
 		$sort->attributes = array('UserOpen'=>array('asc'=>'RequiredBy ASC', 'desc'=>'RequiredBy DESC'), '*');
 
 		return new CActiveDataProvider($this, array(
@@ -141,8 +147,8 @@ class Document extends CActiveRecord
 		$criteria->compare('RowStatus',$this->RowStatus);
 		$criteria->compare('IdRequiredBy',$this->IdRequiredBy);
 		$criteria->compare('DocumentStatus',$this->DocumentStatus);
-		// $criteria->condition = 'DocumentStatus LIKE (IdApprovedBy) OR ';
-		// $criteria->condition .= 'DocumentStatus = IdExecutedBy';
+		$criteria->condition = 'DocumentStatus LIKE (IdApprovedBy) OR ';
+		$criteria->condition .= 'DocumentStatus = IdExecutedBy';
 		$sort->attributes = array('UserOpen'=>array('asc'=>'RequiredBy ASC', 'desc'=>'RequiredBy DESC'), '*');
 
 		return new CActiveDataProvider($this, array(
@@ -182,10 +188,10 @@ class Document extends CActiveRecord
 		if($this->isNewRecord)
 		{
 			// $this->DocumentStatus = "NEW";
-			$this->CreatedBy = $user;
+			$this->CreatedBy = $this->CreatedBy == null ? $user : $this->CreatedBy;
 			$this->CreatedDate = $date;
 			$this->Id = $id;
-			$this->RowStatus = 0;
+			$this->RowStatus = $this->RowStatus == null ? 0 : $this->RowStatus;
 			$this->Realization = 0;
 		}
 		else

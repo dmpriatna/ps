@@ -51,7 +51,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 		'RequiredBy',
 		'ApprovedBy',
 		'ExecutedBy',
-		'Instruction',
+		array('name'=>'DocumentStatus', 'value'=>'User::model()->findByPk($data->DocumentStatus) != null ? User::model()->findByPk($data->DocumentStatus)->Name : $data->DocumentStatus'),
 		/*
 		'CreatedBy',
 		'CreatedDate',
