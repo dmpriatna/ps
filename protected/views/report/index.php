@@ -13,6 +13,18 @@ $('.search-form form').submit(function(){
 	});
 	return false;
 });
+$('#today').submit(function(){
+	$('#final-grid').yiiGridView('update', {
+		data: $(this).serialize()
+	});
+	return false;
+});
+$('#week').submit(function(){
+	$('#final-grid').yiiGridView('update', {
+		data: $(this).serialize()
+	});
+	return false;
+});
 ");
 echo('
 <div class="box box-solid">
@@ -84,7 +96,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 				Final Document
 			  </a>
 			</h4>'.
-CHtml::link('Advanced Search','#',array('class'=>'search-button btn btn-primary pull-right')).'
+CHtml::link('Search By Date','#',array('class'=>'search-button btn btn-primary pull-right')).'
 		  </div>
 		  <div id="collapseThree" class="panel-collapse collapse">
 			<div class="box-body">
@@ -92,10 +104,20 @@ CHtml::link('Advanced Search','#',array('class'=>'search-button btn btn-primary 
 $this->renderPartial('_search',array(
 	'model'=>$final,
 ));
-echo('</div>');
+echo('</div>
+<form style="float:left; margin-right:5px" id="today" method="post">
+<input name="Document[Since]" type="hidden" value="'.date('Y-m-d').'"/>
+<input name="Document[Until]" type="hidden" value="'.date('Y-m-d').'"/>
+<button class="btn btn-primary">Today</button>
+</form>
+<form id="week" method="post">
+<input name="Document[Since]" type="hidden" value="'.date('Y-m-d', strtotime("-1 week")).'"/>
+<input name="Document[Until]" type="hidden" value="'.date('Y-m-d').'"/>
+<button class="btn btn-primary">This Week</button>
+</form>');
 $this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'final-grid',
-	'dataProvider'=>$final->search(),
+	'dataProvider'=>$final->execute(),
 	'columns'=>array(
 		'Code',
 		'DocumentName',
@@ -117,9 +139,3 @@ $this->widget('zii.widgets.grid.CGridView', array(
 </div>');
 
 ?>
-
-<script>
-	$('#close').on('click',function() {
-		history.back();
-	} );
-</script>

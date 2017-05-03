@@ -42,17 +42,17 @@ $authorize = $model->ApprovalStatus == "Revisi" and $model->DocumentStatus == yi
 				<div class="col-sm-5">
 					<?php echo $form->textField($model,'Code', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
 				</div>
-			</div><?php /*
-			<div class="form-group">
-				<?php echo $form->labelEx($model,'Number',array('class'=>'col-sm-3 control-label')); ?>
-				<div class="col-sm-5">
-					<?php echo $form->textField($model,'Number', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
-				</div>
-			</div>*/ ?>
+			</div>
 			<div class="form-group">
 				<?php echo $form->labelEx($model,'DocumentName',array('class'=>'col-sm-3 control-label')); ?>
 				<div class="col-sm-5">
 					<?php echo $form->textField($model,'DocumentName', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
+				</div>
+			</div>
+			<div class="form-group">
+				<?php echo $form->labelEx($model,'SubName',array('class'=>'col-sm-3 control-label')); ?>
+				<div class="col-sm-5">
+					<?php echo $form->textField($model,'SubName', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
 				</div>
 			</div>
 			<div class="form-group">
@@ -95,9 +95,21 @@ $authorize = $model->ApprovalStatus == "Revisi" and $model->DocumentStatus == yi
 				</div>
 			</div>
 			<div class="form-group">
+				<?php echo $form->labelEx($model,'PlanningDate',array('class'=>'col-sm-3 control-label')); ?>
+				<div class="col-sm-5">
+					<?php echo $form->textField($model,'PlanningDate', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
+				</div>
+			</div>
+			<div class="form-group">
 				<?php echo $form->labelEx($model,'Realization',array('class'=>'col-sm-3 control-label')); ?>
 				<div class="col-sm-5">
 					<?php echo $form->textField($model,'Realization', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
+				</div>
+			</div>
+			<div class="form-group">
+				<?php echo $form->labelEx($model,'RealizationDate',array('class'=>'col-sm-3 control-label')); ?>
+				<div class="col-sm-5">
+					<?php echo $form->textField($model,'RealizationDate', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
 				</div>
 			</div>
 			<div class="form-group">

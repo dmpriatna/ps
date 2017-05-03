@@ -79,8 +79,6 @@ class ProfileController extends Controller
 		{
 			if($model->Password === $_POST['User']['Password']){
 				unset($_POST['User']['Password']);
-			} else {
-				$_POST['User']['Password'] = md5($model->Password.$model->UniqKey);
 			}
 			$model->attributes=$_POST['User'];
 			$profile->attributes=$_POST['Profile'];

@@ -5,10 +5,23 @@ $this->breadcrumbs=array(
 	'Dashboard',
 );
 
-$a = count($active);
-$p = count($process);
-$e = count($execute);
-$f = count($final);
+Yii::app()->clientScript->registerScript('search', "
+$('#today').submit(function(){
+	$('#final-grid').yiiGridView('update', {
+		data: $(this).serialize()
+	});
+	return false;
+});
+$('#week').submit(function(){
+	$('#final-grid').yiiGridView('update', {
+		data: $(this).serialize()
+	});
+	return false;
+});");
+// $a = count($active);
+// $p = count($process);
+// $e = count($execute);
+// $f = count($final);
 $userGuid = yii::app()->user->guid;
 $userLevel = yii::app()->user->level;
 ?>
@@ -25,7 +38,23 @@ $userLevel = yii::app()->user->level;
 				<div class="box-header with-border">
 				</div>
 				<div class="box-body">
-					<table id="pol_pdprri" class="table table-bordered table-striped" width="100%">
+<?php $this->widget('zii.widgets.grid.CGridView', array(
+	'id'=>'active-grid',
+	'dataProvider'=>$active->active(),
+	'columns'=>array(
+		array('name'  => 'Code',
+			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl("document/view", array("id"=>$data->Id)))',
+			'type'  => 'raw'),
+		'DocumentName',
+		array('name'=>'UserOpen', 'value'=>'$data->RequiredBy'),
+		'Priority',
+	),
+	'pager'=>array('header'=>''),
+	'pagerCssClass'=>'pagination',
+	'itemsCssClass' => 'table table-bordered table-striped',
+	'htmlOptions'=>array('style'=>'overflow:auto; white-space:nowrap')
+)); ?>
+<?php /*					<table id="pol_pdprri" class="table table-bordered table-striped" width="100%">
 						<thead>
 							<tr>
 								<th width="25%">Code</th>
@@ -43,7 +72,7 @@ $userLevel = yii::app()->user->level;
 							</tr>");
 							} ?>
 						</thead>
-					</table>
+					</table> */ ?>
 				</div>
 				<div class="box-footer">
 				</div>
@@ -54,7 +83,23 @@ $userLevel = yii::app()->user->level;
 				<div class="box-header with-border">
 				</div>
 				<div class="box-body">
-					<table id="pol_kdprri" class="table table-bordered table-striped" width="100%">
+<?php $this->widget('zii.widgets.grid.CGridView', array(
+	'id'=>'process-grid',
+	'dataProvider'=>$process->process(),
+	'columns'=>array(
+		array('name'  => 'Code',
+			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl("document/view", array("id"=>$data->Id)))',
+			'type'  => 'raw'),
+		'DocumentName',
+		array('name'=>'Position Document', 'value'=>'User::model()->findByPk($data->DocumentStatus) != null ? User::model()->findByPk($data->DocumentStatus)->Name : $data->DocumentStatus'),
+		'Priority',
+	),
+	'pager'=>array('header'=>''),
+	'pagerCssClass'=>'pagination',
+	'itemsCssClass' => 'table table-bordered table-striped',
+	'htmlOptions'=>array('style'=>'overflow:auto; white-space:nowrap')
+)); ?>
+<?php /*					<table id="pol_kdprri" class="table table-bordered table-striped" width="100%">
 						<thead>
 							<tr>
 								<th width="25%">Code</th>
@@ -75,7 +120,7 @@ $userLevel = yii::app()->user->level;
 							} ?>
 							</tr>
 						</thead>
-					</table>
+					</table> */ ?>
 				</div>
 				<div class="box-footer">
 				</div>
@@ -86,7 +131,23 @@ $userLevel = yii::app()->user->level;
 				<div class="box-header with-border">
 				</div>
 				<div class="box-body">
-					<table id="pol_pdprdp" class="table table-bordered table-striped" width="100%">
+<?php $this->widget('zii.widgets.grid.CGridView', array(
+	'id'=>'active-grid',
+	'dataProvider'=>$execute->exe(),
+	'columns'=>array(
+		array('name'  => 'Code',
+			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl("document/approve", array("id"=>$data->Id)))',
+			'type'  => 'raw'),
+		'DocumentName',
+		array('name'=>'UserOpen', 'value'=>'$data->RequiredBy'),
+		'Priority',
+	),
+	'pager'=>array('header'=>''),
+	'pagerCssClass'=>'pagination',
+	'itemsCssClass' => 'table table-bordered table-striped',
+	'htmlOptions'=>array('style'=>'overflow:auto; white-space:nowrap')
+)); ?>
+<?php /*					<table id="pol_pdprdp" class="table table-bordered table-striped" width="100%">
 						<thead>
 							<tr>
 								<th width="25%">Code</th>
@@ -106,7 +167,7 @@ $userLevel = yii::app()->user->level;
 							} ?>
 							</tr>
 						</thead>
-					</table>
+					</table> */ ?>
 				</div>
 				<div class="box-footer">
 				</div>
@@ -117,7 +178,33 @@ $userLevel = yii::app()->user->level;
 				<div class="box-header with-border">
 				</div>
 				<div class="box-body">
-					<table id="pol_kdprdp" class="table table-bordered table-striped" width="100%">
+<?php echo('<form style="float:left; margin-right:5px" id="today" method="post">
+<input name="Document[Since]" type="hidden" value="'.date('Y-m-d').'"/>
+<input name="Document[Until]" type="hidden" value="'.date('Y-m-d').'"/>
+<button class="btn btn-primary">Today</button>
+</form>
+<form id="week" method="post">
+<input name="Document[Since]" type="hidden" value="'.date('Y-m-d', strtotime("-1 week")).'"/>
+<input name="Document[Until]" type="hidden" value="'.date('Y-m-d').'"/>
+<button class="btn btn-primary">This Week</button>
+</form>');
+$this->widget('zii.widgets.grid.CGridView', array(
+	'id'=>'final-grid',
+	'dataProvider'=>$final->execute(),
+	'columns'=>array(
+		array('name'  => 'Code',
+			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl("document/view", array("id"=>$data->Id)))',
+			'type'  => 'raw'),
+		'DocumentName',
+		array('name'=>'DocumentStatus', 'value'=>'$data->RequiredBy." ( ".$data->DocumentStatus." )"'),
+		'Priority',
+	),
+	'pager'=>array('header'=>''),
+	'pagerCssClass'=>'pagination',
+	'itemsCssClass' => 'table table-bordered table-striped',
+	'htmlOptions'=>array('style'=>'overflow:auto; white-space:nowrap')
+)); ?>
+<?php /*					<table id="pol_kdprdp" class="table table-bordered table-striped" width="100%">
 						<thead>
 							<tr>
 								<th width="25%">Code</th>
@@ -137,7 +224,7 @@ $userLevel = yii::app()->user->level;
 							} ?>
 							</tr>
 						</thead>
-					</table>
+					</table> */ ?>
 				</div>
 				<div class="box-footer">
 				</div>

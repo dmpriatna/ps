@@ -95,17 +95,6 @@
 					<?php echo $form->error($model,'Budget'); ?>
 				</div>
 			</div>
-			<?php if($model->IdExecutedBy == yii::app()->user->guid) : ?>
-			<div class="form-group">
-				<?php echo $form->labelEx($model,'Realization',array('class'=>'col-sm-3 control-label')); ?>
-				<div class="col-sm-5">
-					<?php echo $form->textField($model,'Realization', array('class' => 'form-control', 'placeholder'=>'Type Here')); ?>
-				</div>
-				<div class="col-sm-3">
-					<?php echo $form->error($model,'Realization'); ?>
-				</div>
-			</div>
-			<?php endif; ?>
 			<div class="form-group">
 				<?php echo $form->labelEx($model,'PlanningDate',array('class'=>'col-sm-3 control-label')); ?>
 				<div class="col-sm-5">
@@ -127,6 +116,38 @@
 					<?php echo $form->error($model,'PlanningDate'); ?>
 				</div>
 			</div>
+			<?php if($model->IdExecutedBy == yii::app()->user->guid) : ?>
+			<div class="form-group">
+				<?php echo $form->labelEx($model,'RealizationDate',array('class'=>'col-sm-3 control-label')); ?>
+				<div class="col-sm-5">
+				<?php $this->widget('zii.widgets.jui.CJuiDatePicker',array(
+					'attribute'=>'RealizationDate',
+					'model'=>$model,
+					'options'=>array(
+						'changeMonth'=>true,
+						'changeYear'=>true,
+						'dateFormat'=>'yy-mm-dd',
+					),
+					'htmlOptions'=>array(
+						'class'=>'form-control',
+						'placeholder'=>'Realization Date of Budget'
+					),
+				)); ?>
+				</div>
+				<div class="col-sm-3">
+					<?php echo $form->error($model,'RealizationDate'); ?>
+				</div>
+			</div>
+			<div class="form-group">
+				<?php echo $form->labelEx($model,'Realization',array('class'=>'col-sm-3 control-label')); ?>
+				<div class="col-sm-5">
+					<?php echo $form->textField($model,'Realization', array('class' => 'form-control', 'placeholder'=>'Type Here')); ?>
+				</div>
+				<div class="col-sm-3">
+					<?php echo $form->error($model,'Realization'); ?>
+				</div>
+			</div>
+			<?php endif; ?>
 			<div class="form-group">
 				<?php echo $form->labelEx($model,'Instruction',array('class'=>'col-sm-3 control-label')); ?>
 				<div class="col-sm-5">

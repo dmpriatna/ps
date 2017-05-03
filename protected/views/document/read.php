@@ -80,9 +80,21 @@ $this->breadcrumbs=array(
 				</div>
 			</div>
 			<div class="form-group">
+				<?php echo $form->labelEx($model,'PlanningDate',array('class'=>'col-sm-3 control-label')); ?>
+				<div class="col-sm-5">
+					<?php echo $form->textField($model,'PlanningDate', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
+				</div>
+			</div>
+			<div class="form-group">
 				<?php echo $form->labelEx($model,'Realization',array('class'=>'col-sm-3 control-label')); ?>
 				<div class="col-sm-5">
 					<?php echo $form->textField($model,'Realization', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
+				</div>
+			</div>
+			<div class="form-group">
+				<?php echo $form->labelEx($model,'RealizationDate',array('class'=>'col-sm-3 control-label')); ?>
+				<div class="col-sm-5">
+					<?php echo $form->textField($model,'RealizationDate', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
 				</div>
 			</div>
 			<div class="form-group">

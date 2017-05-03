@@ -62,11 +62,12 @@ class Structure extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
-			'sort'=>array(
-				'defaultOrder'=>array(
-					'Level'=>false
-				)
-			)
+			'sort'=>array('defaultOrder'=>'CreatedDate desc')
+			// 'sort'=>array(
+				// 'defaultOrder'=>array(
+					// 'Level'=>false
+				// )
+			// )
 		));
 	}
 	

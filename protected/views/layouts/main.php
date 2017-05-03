@@ -3,6 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<!-- <meta http-equiv="refresh" content="60"> -->
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
 	<!-- Tell the browser to be responsive to screen width -->
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -140,6 +141,7 @@
 	  <?php $menu=array(
 			array('label'=>'<i class="fa fa-files-o pull-right"></i>Documents', 'url'=>array('/role')),
 			array('label'=>'<i class="fa fa-files-o pull-right"></i>Report', 'url'=>array('/report')),
+			array('label'=>'<i class="fa fa-files-o pull-right"></i>Reminder', 'url'=>array('/report/view')),
 			array('label'=>'<i class="fa fa-th pull-right"></i>Structure Diagram', 'url'=>array('/site/page', 'view'=>'dc')),
 		);
 

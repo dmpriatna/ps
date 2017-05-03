@@ -20,10 +20,11 @@ class Document extends CActiveRecord
 			array('Code, DocumentName, Priority, Description, RequiredBy, ApprovedBy, ExecutedBy, Budget, PlanningDate, DocumentStatus, CreatedBy, CreatedDate, Id, RowStatus', 'required'),
 			array('Budget, Realization, RowStatus', 'numerical', 'integerOnly'=>true),
 			array('Budget', 'greaterThanZero'),
-			array('Code, DocumentName, Description, IdRequiredBy, RequiredBy, IdApprovedBy, ApprovedBy, IdExecutedBy, ExecutedBy, ApprovalStatus, DocumentStatus, CreatedBy', 'length', 'max'=>256),
+			array('Code, DocumentName, SubName, Description, IdRequiredBy, RequiredBy, IdApprovedBy, ApprovedBy, IdExecutedBy, ExecutedBy, ApprovalStatus, DocumentStatus, CreatedBy', 'length', 'max'=>256),
 			array('Id', 'length', 'max'=>36),
 			array('Instruction', 'safe'),
 			array('Code, DocumentName, Priority, Description, IdRequiredBy, RequiredBy, ApprovedBy, ExecutedBy, Instruction, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus, DocumentStatus, Since, Until', 'safe', 'on'=>'search'),
+			array('Code, DocumentName, Priority, Description, IdRequiredBy, RequiredBy, ApprovedBy, ExecutedBy, Instruction, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus, DocumentStatus, Since, Until', 'safe', 'on'=>'execute'),
 		);
 	}
 
@@ -78,19 +79,16 @@ class Document extends CActiveRecord
 		$criteria->compare('Budget',$this->Instruction);
 		$criteria->compare('Instruction',$this->Instruction,true);
 		$criteria->compare('CreatedBy',$this->CreatedBy,true);
-		// $criteria->compare('CreatedDate',$this->CreatedDate,true);
 		$criteria->compare('Id',$this->Id,true);
 		$criteria->compare('ModifiedBy',$this->ModifiedBy,true);
 		$criteria->compare('ModifiedDate',$this->ModifiedDate,true);
 		$criteria->compare('RowStatus',$this->RowStatus);
 		$criteria->compare('IdRequiredBy',$this->IdRequiredBy);
 		$criteria->compare('DocumentStatus',$this->DocumentStatus);
-		$criteria->addBetweenCondition('CreatedDate', $this->Since, $this->Until);
-		$sort->attributes = array('UserOpen'=>array('asc'=>'RequiredBy ASC', 'desc'=>'RequiredBy DESC'), '*');
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
-			'sort'=>$sort
+			'sort'=>array('defaultOrder'=>'CreatedDate desc')
 		));
 	}
 	
@@ -98,26 +96,11 @@ class Document extends CActiveRecord
 	{
 		$criteria=new CDbCriteria;
 		$sort = new CSort();
+		$user = yii::app()->user->guid;
 
-		$criteria->compare('Code',$this->Code,true);
-		$criteria->compare('DocumentName',$this->DocumentName,true);
-		$criteria->compare('Priority',$this->Priority);
-		$criteria->compare('Description',$this->Description,true);
-		$criteria->compare('RequiredBy',$this->RequiredBy,true);
-		$criteria->compare('ApprovedBy',$this->ApprovedBy,true);
-		$criteria->compare('ExecutedBy',$this->ExecutedBy,true);
-		$criteria->compare('Budget',$this->Instruction);
-		$criteria->compare('Instruction',$this->Instruction,true);
-		$criteria->compare('CreatedBy',$this->CreatedBy,true);
-		$criteria->compare('CreatedDate',$this->CreatedDate,true);
-		$criteria->compare('Id',$this->Id,true);
-		$criteria->compare('ModifiedBy',$this->ModifiedBy,true);
-		$criteria->compare('ModifiedDate',$this->ModifiedDate,true);
-		$criteria->compare('RowStatus',$this->RowStatus);
-		$criteria->compare('IdRequiredBy',$this->IdRequiredBy);
-		$criteria->compare('DocumentStatus',$this->DocumentStatus);
-		$criteria->condition = 'DocumentStatus = IdRequiredBy';
-		$sort->attributes = array('UserOpen'=>array('asc'=>'RequiredBy ASC', 'desc'=>'RequiredBy DESC'), '*');
+		$criteria->compare('RowStatus', $this->RowStatus);
+		$criteria->condition = 'IdExecutedBy != "'.$user.'" AND DocumentStatus = "'.$user.'"';
+		$sort->attributes = array('UserOpen'=>array('asc'=>'RequiredBy ASC', 'desc'=>'RequiredBy DESC'), '*', 'defaultOrder'=>'CreatedDate desc');
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -129,27 +112,11 @@ class Document extends CActiveRecord
 	{
 		$criteria=new CDbCriteria;
 		$sort = new CSort();
+		$user = yii::app()->user->guid;
 
-		$criteria->compare('Code',$this->Code,true);
-		$criteria->compare('DocumentName',$this->DocumentName,true);
-		$criteria->compare('Priority',$this->Priority);
-		$criteria->compare('Description',$this->Description,true);
-		$criteria->compare('RequiredBy',$this->RequiredBy,true);
-		$criteria->compare('ApprovedBy',$this->ApprovedBy,true);
-		$criteria->compare('ExecutedBy',$this->ExecutedBy,true);
-		$criteria->compare('Budget',$this->Instruction);
-		$criteria->compare('Instruction',$this->Instruction,true);
-		$criteria->compare('CreatedBy',$this->CreatedBy,true);
-		$criteria->compare('CreatedDate',$this->CreatedDate,true);
-		$criteria->compare('Id',$this->Id,true);
-		$criteria->compare('ModifiedBy',$this->ModifiedBy,true);
-		$criteria->compare('ModifiedDate',$this->ModifiedDate,true);
-		$criteria->compare('RowStatus',$this->RowStatus);
-		$criteria->compare('IdRequiredBy',$this->IdRequiredBy);
-		$criteria->compare('DocumentStatus',$this->DocumentStatus);
-		$criteria->condition = 'DocumentStatus LIKE (IdApprovedBy) OR ';
-		$criteria->condition .= 'DocumentStatus = IdExecutedBy';
-		$sort->attributes = array('UserOpen'=>array('asc'=>'RequiredBy ASC', 'desc'=>'RequiredBy DESC'), '*');
+		$criteria->compare('RowStatus', $this->RowStatus);
+		$criteria->condition = '(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus NOT IN ("'.$user.'","FINAL","CANCEL")';
+		$sort->attributes = array('Position Document'=>array('asc'=>'DocumentStatus ASC', 'desc'=>'DocumentStatus DESC'), '*', 'defaultOrder'=>'CreatedDate desc');
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -157,21 +124,40 @@ class Document extends CActiveRecord
 		));
 	}
 	
-	// public function getUser()
-	// {
-		// return CHtml::ListData(User::model()->findAll(), "Id", "Name");
-	// }
-	
-	// public function getApprove()
-	// {
-		// return CHtml::ListData(User::model()->findAll(), "Id", "Name");
-	// }
-	
-	// public function getExecute()
-	// {
-		// return CHtml::ListData(User::model()->findAll(), "Id", "Name");
-	// }
+	public function execute()
+	{
+		$criteria=new CDbCriteria;
+		$sort = new CSort();
+		$user = yii::app()->user->guid;
 
+		$criteria->compare('RowStatus', $this->RowStatus);
+		$criteria->condition = '(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus = "FINAL"';
+		if($this->Since != '' && $this->Until != '')
+			$criteria->condition .= ' AND CreatedDate BETWEEN "'.$this->Since.'" AND "'.$this->Until.'"';
+		$sort->attributes = array('defaultOrder'=>'CreatedDate desc');
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>$sort
+		));
+	}
+	
+	public function exe()
+	{
+		$criteria=new CDbCriteria;
+		$sort = new CSort();
+		$user = yii::app()->user->guid;
+
+		$criteria->compare('RowStatus', $this->RowStatus);
+		$criteria->condition = 'IdExecutedBy = "'.$user.'" AND ApprovalStatus = "Approved"';
+		$sort->attributes = array('defaultOrder'=>'CreatedDate desc');
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>$sort
+		));
+	}
+	
 	public function greaterThanZero($attribute, $params)
 	{
 		if ($this->$attribute <= 0)
@@ -187,7 +173,6 @@ class Document extends CActiveRecord
 		$date = date('Y-m-d H:m:s');
 		if($this->isNewRecord)
 		{
-			// $this->DocumentStatus = "NEW";
 			$this->CreatedBy = $this->CreatedBy == null ? $user : $this->CreatedBy;
 			$this->CreatedDate = $date;
 			$this->Id = $id;

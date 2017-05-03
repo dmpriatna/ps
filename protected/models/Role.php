@@ -67,6 +67,7 @@ class Role extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'sort'=>array('defaultOrder'=>'CreatedDate desc')
 		));
 	}
 
@@ -86,6 +87,15 @@ class Role extends CActiveRecord
 		}
 		else
 		{
+			$tail = substr($this->ApprovedBy,0,-2);
+			$rplc = str_replace(", ","\",\"",$tail);
+			$string = "(\"".$rplc."\")";
+			$tempId = array();
+			$struc = Structure::model()->findAll(array('condition'=>'concat(GroupEmployee," ",Division) in '.$string));
+			foreach($struc as $data){
+				$tempId[] = User::model()->find(array('condition'=>'StructureId = "'.$data->Id.'"'))->Id;
+			}
+			$this->IdApprovedBy = join(', ', $tempId);
 			$this->ModifiedBy = $user;
 			$this->ModifiedDate = $date;
 		}

@@ -21,8 +21,7 @@ class ReportController extends Controller
 	{
 		$active = new Document('active');
 		$process = new Document('process');
-		$final = new Document('search');
-		$final->DocumentStatus = 'FINAL';
+		$final = new Document('execute');
 		if(isset($_REQUEST['Document'])){
 			$final->attributes=$_REQUEST['Document'];
 		}
@@ -30,6 +29,18 @@ class ReportController extends Controller
 			'active'=>$active,
 			'process'=>$process,
 			'final'=>$final,
+		));
+	}
+
+	public function actionView()
+	{
+		$model = new Document('search');
+		$model->RowStatus = 2;
+		if(isset($_REQUEST['Document'])){
+			$model->attributes=$_REQUEST['Document'];
+		}
+		$this->render('reminder',array(
+			'model'=>$model,
 		));
 	}
 }

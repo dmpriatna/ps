@@ -164,8 +164,8 @@ class DocumentController extends Controller
  
         echo $model->Content; */
 		$model=$this->loadModel($id);
-		$comment = Comment::model()->findAllByAttributes(array('DocumentId'=>$id));
-		$log = History::model()->findAllByAttributes(array('Subject'=>$id));
+		$comment = Comment::model()->findAllByAttributes(array('DocumentId'=>$id), array('order'=>'CreatedDate desc'));
+		$log = History::model()->findAllByAttributes(array('Subject'=>$id), array('order'=>'CreatedDate desc'));
 
 		$this->render('view',array(
 			'model'=>$model,
@@ -177,8 +177,8 @@ class DocumentController extends Controller
 	public function actionRead($id)
 	{
 		$model=$this->loadModel($id);
-		$comment = Comment::model()->findAllByAttributes(array('DocumentId'=>$id));
-		$log = History::model()->findAllByAttributes(array('Subject'=>$id));
+		$comment = Comment::model()->findAllByAttributes(array('DocumentId'=>$id), array('order'=>'CreatedDate desc'));
+		$log = History::model()->findAllByAttributes(array('Subject'=>$id), array('order'=>'CreatedDate desc'));
 
 		$this->render('read',array(
 			'model'=>$model,
@@ -232,31 +232,35 @@ class DocumentController extends Controller
 					$role->Number = sprintf("%04s%s",++$num[0],"/".$num[1]."/".$num[2]);
 					$role->save();
 
-					$file = array();
-					foreach($_FILES['Attachment'] as $key1 => $value1) {
-						foreach($value1['UploadedFile'] as $key2 => $value2) {
-							$file[$key2][$key1] = $value2;
+					if($_FILES['Attachment']['name']['UploadedFile'][0] != null){
+						$file = array();
+						foreach($_FILES['Attachment'] as $key1 => $value1) {
+							foreach($value1['UploadedFile'] as $key2 => $value2) {
+								$file[$key2][$key1] = $value2;
+							}
 						}
-					}
-					
-					foreach($file as $value) {
-						$charid = strtoupper(md5(uniqid(rand(), true)));
-						$ext = pathinfo($value['name'], PATHINFO_EXTENSION);
-						$new = Yii::app()->basePath.'/views/images/'.$charid.'.'.$ext;
-						$attach = new Attachment;
-						$attach->Name = $charid.'.'.$ext;
-						$attach->Type = $value['type'];
-						$attach->Size = $value['size'];
-						$attach->DocumentId = $model->Id;
-						if($attach->save()) move_uploaded_file($value['tmp_name'], $new);
+						
+						foreach($file as $value) {
+							$charid = strtoupper(md5(uniqid(rand(), true)));
+							$ext = pathinfo($value['name'], PATHINFO_EXTENSION);
+							$new = Yii::app()->basePath.'/views/images/'.$charid.'.'.$ext;
+							$attach = new Attachment;
+							$attach->Name = $charid.'.'.$ext;
+							$attach->Type = $value['type'];
+							$attach->Size = $value['size'];
+							$attach->DocumentId = $model->Id;
+							if($attach->save()) move_uploaded_file($value['tmp_name'], $new);
+						}
 					}
 				}
 				$trans->commit();
 					$this->redirect(array('view','id'=>$model->Id));
 			} catch(Exception $e) {
 				$trans->rollback();
-				Yii::app()->user->setFlash('error', "{$e->getMessage()}");
-				$this->refresh();
+				$this->render('create',array(
+					'attach'=>$attach,
+					'model'=>$model,
+				));
 			}
 		}
 		

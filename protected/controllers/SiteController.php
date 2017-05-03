@@ -25,25 +25,32 @@ class SiteController extends Controller
 		else {
 			$model = Document::model();
 			$user = yii::app()->user->guid;
-			$level = yii::app()->user->level;
-			if($level == "Reader"){				
-				$active = $model->findAll(array('condition'=>'ApprovalStatus IS NULL OR ApprovalStatus = "Revise"'));
+			// $level = yii::app()->user->level;
+			// if($level == "Reader"){				
+				// $active = $model->findAll(array('condition'=>'ApprovalStatus IS NULL OR ApprovalStatus = "Revise"'));
+				// $model->unsetAttributes();
+				// $process = $model->findAll(array('condition'=>'ApprovalStatus = "Proccess"'));
+				// $model->unsetAttributes();
+				// $execute = $model->findAll(array('condition'=>'ApprovalStatus = "Approved"'));
+				// $model->unsetAttributes();
+				// $final = $model->findAll(array('condition'=>'ApprovalStatus = "Executed"'));
+			// } else {
+				$a = $model->findAll(array('condition'=>'IdExecutedBy != "'.$user.'" AND DocumentStatus = "'.$user.'"'));
 				$model->unsetAttributes();
-				$process = $model->findAll(array('condition'=>'ApprovalStatus = "Proccess"'));
+				$p = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus NOT IN ("'.$user.'","FINAL","CANCEL")'));
 				$model->unsetAttributes();
-				$execute = $model->findAll(array('condition'=>'ApprovalStatus = "Approved"'));
+				$e = $model->findAll(array('condition'=>'IdExecutedBy = "'.$user.'" AND ApprovalStatus = "Approved"'));
 				$model->unsetAttributes();
-				$final = $model->findAll(array('condition'=>'ApprovalStatus = "Executed"'));
-			} else {
-				$active = $model->findAll(array('condition'=>'IdExecutedBy != "'.$user.'" AND DocumentStatus = "'.$user.'"'));
-				$model->unsetAttributes();
-				$process = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus NOT IN ("'.$user.'","FINAL","CANCEL")'));
-				$model->unsetAttributes();
-				$execute = $model->findAll(array('condition'=>'IdExecutedBy = "'.$user.'" AND ApprovalStatus = "Approved"'));
-				$model->unsetAttributes();
-				$final = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus = "FINAL"'));
+				$f = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus = "FINAL"'));
+			// }
+			$active = new Document('active');
+			$process = new Document('process');
+			$final = new Document('execute');
+			$execute = new Document('exe');
+			if(isset($_REQUEST['Document'])){
+				$final->attributes=$_REQUEST['Document'];
 			}
-			$this->render('index', array('active'=>$active, 'process'=>$process, 'execute'=>$execute, 'final'=>$final));
+			$this->render('index', array('active'=>$active, 'process'=>$process, 'execute'=>$execute, 'final'=>$final, 'a'=>count($a), 'p'=>count($p), 'e'=>count($e), 'f'=>count($f)));
 		}
 	}
 
@@ -172,6 +179,7 @@ class SiteController extends Controller
 			Yii::app()->db->createCommand("CREATE TABLE `document` (
 			  `Code` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
 			  `DocumentName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `SubName` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
 			  `Priority` enum('Segera','Penting','Biasa') COLLATE utf8_unicode_ci NOT NULL,
 			  `Description` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
 			  `IdRequiredBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -181,7 +189,9 @@ class SiteController extends Controller
 			  `IdExecutedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
 			  `ExecutedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
 			  `Budget` bigint(20) NOT NULL,
+			  `PlanningDate` datetime NOT NULL,
 			  `Realization` bigint(20) NOT NULL,
+			  `RealizationDate` datetime DEFAULT NULL,
 			  `Instruction` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
 			  `ApprovalData` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
 			  `ApprovalStatus` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -306,35 +316,36 @@ class SiteController extends Controller
 	private function Reminder()
 	{
 		$role = Role::model()->find(array('condition'=>'Code = "REMINDER"'));
-		// $code = if(explode("/", $data->Number)[1] != date('m')) {
-				// $data->Number = "0001/".date('m')."/".date('Y');
-				// $data->save();
-			// }
-		$doc = Document::model()->findAll(array('condition'=>'RowStatus = 0 AND DATE(PlanningDate) = CURRENT_DATE() + INTERVAL 1 DAY'));
+		$doc = Document::model()->findAll(array('condition'=>'RowStatus = 0 AND DATE(PlanningDate) = CURRENT_DATE() + INTERVAL 1 DAY AND DocumentStatus != "FINAL"'));
 		$new = new Document;
-		if($doc != null)
-		foreach($doc as $data) {
-			$new->Budget += $data->Budget;
-			$data->RowStatus = 1;
-			$data->save();
+		if($doc != null) {
+			foreach($doc as $data) {
+				$new->Budget += $data->Budget;
+				$new->SubName .= $data->Code.'; ';
+				$data->RowStatus = 1;
+				$data->save();
+			}
+			$new->Code = $role->Code.'/'.$role->Number;
+			$new->DocumentName = $role->DocumentName;
+			$new->Priority = $role->Priority;
+			$new->Description = $role->Description;
+			$new->IdRequiredBy = '00000000-0000-0000-0000-000000000000';
+			$new->RequiredBy = 'System';
+			$new->IdApprovedBy ='00000000-0000-0000-0000-000000000000';
+			$new->ApprovedBy ='System';
+			$new->IdExecutedBy = $role->IdExecutedBy;
+			$new->ExecutedBy = $role->ExecutedBy;
+			$new->PlanningDate = date('Y-m-d');
+			$new->ApprovalData = 'a:1:{s:36:"00000000-0000-0000-0000-000000000000";i:1;}';
+			$new->ApprovalStatus = 'Approved';
+			$new->DocumentStatus = $role->ExecutedBy;
+			$new->CreatedBy = 'System';
+			$new->RowStatus = 2;
+			if($new->save()) {
+				$num = explode("/", $role->Number);
+				$role->Number = sprintf("%04s%s",++$num[0],"/".$num[1]."/".$num[2]);
+				$role->save();				
+			}
 		}
-		$new->Code = 'REMINDER/0001/'.date('m').'/'.date('Y');
-		$new->DocumentName = 'Pengingat Pembayaran';
-		$new->SubName .= $data->Code.'; ';
-		$new->Priority = 'Penting';
-		$new->Description = 'Mengingatkan Pembayaran Untuk Keperluan Dokumen Yang Akan Jatuh Tempo';
-		$new->IdRequiredBy = '00000000-0000-0000-0000-000000000000';
-		$new->RequiredBy = 'System';
-		$new->IdApprovedBy ='00000000-0000-0000-0000-000000000000';
-		$new->ApprovedBy ='System';
-		$new->IdExecutedBy = '1E951857-08E4-BF8A-1E6E-C4BEE277897C';
-		$new->ExecutedBy = 'Ami Rahmiatin';
-		$new->PlanningDate = date('Y-m-d');
-		$new->ApprovalData = 'a:1:{s:36:"00000000-0000-0000-0000-000000000000";i:1;}';
-		$new->ApprovalStatus = 'Approved';
-		$new->DocumentStatus = '1E951857-08E4-BF8A-1E6E-C4BEE277897C';
-		$new->CreatedBy = 'System';
-		$new->RowStatus = 9;
-		$new->save();
 	}
 }

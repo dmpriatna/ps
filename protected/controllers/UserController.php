@@ -46,7 +46,7 @@ class UserController extends Controller
 		{
 			if($model->Password === $_POST['User']['Password']){
 				unset($_POST['User']['Password']);
-			} else $_POST['User']['Password'] = md5($model->Password.$model->UniqKey);
+			}
 			$model->attributes=$_POST['User'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->Id));
