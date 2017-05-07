@@ -32,7 +32,19 @@ class ReportController extends Controller
 		));
 	}
 
-	public function actionView()
+	public function actionView($id)
+	{
+		$model = Document::model()->findByPk($id);
+		$comment = Comment::model()->findAllByAttributes(array('DocumentId'=>$id), array('order'=>'CreatedDate desc'));
+		$log = History::model()->findAllByAttributes(array('Subject'=>$id), array('order'=>'CreatedDate desc'));
+		$this->render('view',array(
+			'model'=>$model,
+			'comment'=>$comment,
+			'history'=>$log,
+		));
+	}
+
+	public function actionReminder()
 	{
 		$model = new Document('search');
 		$model->RowStatus = 2;
@@ -40,6 +52,48 @@ class ReportController extends Controller
 			$model->attributes=$_REQUEST['Document'];
 		}
 		$this->render('reminder',array(
+			'model'=>$model,
+		));
+	}
+
+	public function actionFinal()
+	{
+		$model = new Document('search');
+		$model->DocumentStatus = "FINAL";
+		$model->Since = date('Y-m-d', strtotime(date('Y').date('m')."01"));
+		$model->Until = date('Y-m-d');
+		if(isset($_REQUEST['Document'])){
+			$model->attributes=$_REQUEST['Document'];
+		}
+		$this->render('final',array(
+			'model'=>$model,
+		));
+	}
+
+	public function actionCancel()
+	{
+		$model = new Document('search');
+		$model->DocumentStatus = "CANCEL";
+		$model->Since = date('Y-m-d', strtotime(date('Y').date('m')."01"));
+		$model->Until = date('Y-m-d');
+		if(isset($_REQUEST['Document'])){
+			$model->attributes=$_REQUEST['Document'];
+		}
+		$this->render('cancel',array(
+			'model'=>$model,
+		));
+	}
+
+	public function actionReal()
+	{
+		$model = new Document('search');
+		$model->DocumentStatus = "FINAL";
+		$model->Since = date('Y-m-d', strtotime(date('Y').date('m')."01"));
+		$model->Until = date('Y-m-d');
+		if(isset($_REQUEST['Document'])){
+			$model->attributes=$_REQUEST['Document'];
+		}
+		$this->render('real',array(
 			'model'=>$model,
 		));
 	}

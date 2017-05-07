@@ -4,7 +4,7 @@ class UserIdentity extends CUserIdentity
 {
 	public function authenticate()
 	{
-		$users = User::model()->find(array('condition'=>'Name = "'.$this->username.'" OR Email = "'.$this->username.'"'));
+		$users = User::model()->find(array('condition'=>'Name = "'.$this->username.'" AND Status = "Aktif" OR Email = "'.$this->username.'"'));
 		if($users===null)
 			$this->errorCode=self::ERROR_USERNAME_INVALID;
 		elseif(!$users->magic($this->password))

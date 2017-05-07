@@ -3,7 +3,7 @@
 /* @var $model Document */
 
 $this->breadcrumbs=array(
-	'Documents'=>array('/site/index'),
+	'Report'=>array('/report'),
 	$model->Code,
 );
 
@@ -148,16 +148,10 @@ $authorize = $model->ApprovalStatus == "Revisi" and $model->DocumentStatus == yi
 								if(preg_match('/image/',$img->Type)) {
 									$url = Yii::app()->request->baseUrl.'/protected/views/images/'.$img->Name;
 									echo "<a href='$url' target='_blank'>".CHtml::image($url, "image",array("width"=>200))."</a>";
-									if(strtolower($img->CreatedBy) == yii::app()->user->name){
-										echo("<a href='/site/deletefile/$img->Id'><button class='btn btn-danger'>Delete</button><a>");
-									}
 								} else {
 									$url = Yii::app()->request->baseUrl.'/protected/views/images/accepted_document.png';
 									$file = Yii::app()->request->baseUrl.'/protected/views/images/'.$img->Name;
 									echo "<a href='$file' target='_blank'>".CHtml::image($url, "image",array("width"=>200))."</a>";
-									if(strtolower($img->CreatedBy) == yii::app()->user->name){
-										echo("<a href='/site/deletefile/$img->Id'><button class='btn btn-danger'>Delete</button><a>");
-									}
 								}
 								echo " ";
 							}
@@ -194,18 +188,6 @@ $authorize = $model->ApprovalStatus == "Revisi" and $model->DocumentStatus == yi
               </div>
               <!-- /.box-comment -->
 			<?php endforeach; ?>
-            </div>
-            <!-- /.box-footer -->
-            <div class="box-footer">
-              <form action="<?=Yii::app()->request->baseUrl?>/comment/create" method="post">
-                <img class="img-responsive img-circle img-sm" src="<?=Yii::app()->request->baseUrl?>/themes/alte/dist/img/user.png" alt="Alt Text">
-                <!-- .img-push is used to add margin to elements next to floating images -->
-                <div class="img-push">
-                  <input name="Comment[Content]" type="text" class="form-control input-sm" placeholder="Press enter to post comment">
-                  <input name="Comment[DocumentId]" type="hidden" value="<?=$model->Id?>">
-                  <input name="Comment[UserId]" type="hidden" value="<?=yii::app()->user->guid?>">
-                </div>
-              </form>
             </div>
             <!-- /.box-footer -->
 			</div>

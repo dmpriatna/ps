@@ -88,6 +88,9 @@
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
 				
+          <li class="dropdown">
+			<a class="glyphicon glyphicon-refresh" href=""></a>
+          </li>
           <!-- User Account Menu -->
           <li class="dropdown user user-menu">
             <!-- Menu Toggle Button -->
@@ -127,7 +130,7 @@
             </ul>
           </li>
           <!-- Control Sidebar Toggle Button -->
-		  <?php if($user->level == "Super Admin" || $user->level == "Admin"){ echo"
+		  <?php if($user->level == "Super Admin" || $user->level == "Admin" || $user->level == "Reader"){ echo"
 			<li><a href='#' data-toggle='control-sidebar'><i class='fa fa-gears'></i></a></li>"; } ?>
         </ul>
       </div>
@@ -141,7 +144,7 @@
 	  <?php $menu=array(
 			array('label'=>'<i class="fa fa-files-o pull-right"></i>Documents', 'url'=>array('/role')),
 			array('label'=>'<i class="fa fa-files-o pull-right"></i>Report', 'url'=>array('/report')),
-			array('label'=>'<i class="fa fa-files-o pull-right"></i>Reminder', 'url'=>array('/report/view')),
+			array('label'=>'<i class="fa fa-files-o pull-right"></i>Reminder', 'url'=>array('/report/reminder')),
 			array('label'=>'<i class="fa fa-th pull-right"></i>Structure Diagram', 'url'=>array('/site/page', 'view'=>'dc')),
 		);
 

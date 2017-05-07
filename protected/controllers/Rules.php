@@ -4,16 +4,19 @@
 		switch(yii::app()->user->level)
 		{
 			case "Super Admin" :
-				$array = array_merge($array,array('admin','create','delete','update','view','pass'));
+				$array = array_merge($array,array('admin','create','delete','update','view','pass','reminder','final','cancel','real'));
 			break;
 			case "Admin" :
-				$array = array_merge($array,array('add','admin','create','update','view','pass'));
+				$array = array_merge($array,array('add','admin','create','update','view','pass','reminder','final','cancel','real'));
 			break;
 			case "User" :
 				if(isset($_REQUEST['id']))
 				if($_REQUEST['id'] == yii::app()->user->guid)
 					$array = array_merge($array,array('update'));
-				$array = array_merge($array,array('add','create','view','approve','pass'));
+				$array = array_merge($array,array('add','create','view','approve','pass','reminder'));
+			break;
+			case "Reader" :
+				$array = array_merge($array,array('reminder','final','cancel','real'));
 			break;
 			default :
 				$array = array_merge($array,array());

@@ -12,7 +12,7 @@ class Document extends CActiveRecord
 		return 'document';
 	}
 
-	public $Since, $Until;
+	public $Since, $Until, $FinalDate, $CancelDate, $TimeProcess;
 	
 	public function rules()
 	{
@@ -23,8 +23,8 @@ class Document extends CActiveRecord
 			array('Code, DocumentName, SubName, Description, IdRequiredBy, RequiredBy, IdApprovedBy, ApprovedBy, IdExecutedBy, ExecutedBy, ApprovalStatus, DocumentStatus, CreatedBy', 'length', 'max'=>256),
 			array('Id', 'length', 'max'=>36),
 			array('Instruction', 'safe'),
-			array('Code, DocumentName, Priority, Description, IdRequiredBy, RequiredBy, ApprovedBy, ExecutedBy, Instruction, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus, DocumentStatus, Since, Until', 'safe', 'on'=>'search'),
-			array('Code, DocumentName, Priority, Description, IdRequiredBy, RequiredBy, ApprovedBy, ExecutedBy, Instruction, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus, DocumentStatus, Since, Until', 'safe', 'on'=>'execute'),
+			array('Code, DocumentName, SubName, Priority, Description, IdRequiredBy, RequiredBy, ApprovedBy, ExecutedBy, Instruction, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus, DocumentStatus, Since, Until', 'safe', 'on'=>'search'),
+			array('Code, DocumentName, SubName, Priority, Description, IdRequiredBy, RequiredBy, ApprovedBy, ExecutedBy, Instruction, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus, DocumentStatus, Since, Until', 'safe', 'on'=>'execute'),
 		);
 	}
 
@@ -61,6 +61,9 @@ class Document extends CActiveRecord
 			'UserOpen' => 'User Open',
 			'Since' => 'Form',
 			'Until' => 'To',
+			'FinalDate' => 'Final Date',
+			'CancelDaten' => 'Cancel Date',
+			'TimeProcess' => 'Time Process',
 		);
 	}
 
@@ -71,6 +74,7 @@ class Document extends CActiveRecord
 
 		$criteria->compare('Code',$this->Code,true);
 		$criteria->compare('DocumentName',$this->DocumentName,true);
+		$criteria->compare('SubName',$this->SubName,true);
 		$criteria->compare('Priority',$this->Priority);
 		$criteria->compare('Description',$this->Description,true);
 		$criteria->compare('RequiredBy',$this->RequiredBy,true);
@@ -85,6 +89,8 @@ class Document extends CActiveRecord
 		$criteria->compare('RowStatus',$this->RowStatus);
 		$criteria->compare('IdRequiredBy',$this->IdRequiredBy);
 		$criteria->compare('DocumentStatus',$this->DocumentStatus);
+		if($this->Since != '' && $this->Until != '')
+			$criteria->condition .= ' AND CreatedDate BETWEEN "'.$this->Since.'" AND "'.$this->Until.'"';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -162,6 +168,28 @@ class Document extends CActiveRecord
 	{
 		if ($this->$attribute <= 0)
 			$this->addError($attribute, $attribute.' must be greater than 0');
+	}
+
+	public function FinalDate()
+	{
+		return $this->TimeProcess = History::model()->find(array('condition'=>'Subject = "'.$this->Id.'" AND Predicate = "Executed"'))->CreatedDate;
+	}
+
+	public function CancelDate()
+	{
+		return $this->TimeProcess = History::model()->find(array('condition'=>'Subject = "'.$this->Id.'" AND Predicate = "Rejected"'))->CreatedDate;
+	}
+
+	public function gap()
+	{
+		$create = History::model()->find(array('condition'=>'Subject = "'.$this->Id.'" AND Predicate = "Create Document"'))->CreatedDate;
+		$execute = History::model()->find(array('condition'=>'Subject = "'.$this->Id.'" AND Predicate = "Executed"'))->CreatedDate;
+		$diff = date_diff(date_create($execute), date_create($create));
+		$days = $diff->format("%d days");
+		$hours = $diff->format("%h hours");
+		$minutes = $diff->format("%i minutes");
+		$seconds = $diff->format("%s seconds");
+		return $this->TimeProcess = $days > 0 ? $days : ($hours > 0 ? $hours : ($minutes > 0 ? $minutes : $seconds));
 	}
 
 	protected function beforeValidate()

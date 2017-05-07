@@ -33,6 +33,9 @@ $this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'active-grid',
 	'dataProvider'=>$model->search(),
 	'columns'=>array(
+		// array('name'  => 'Code',
+			// 'value' => 'CHtml::link($data->Code, Yii::app()->createUrl("report/view", array("id"=>$data->Id)))',
+			// 'type'  => 'raw'),
 		'Code',
 		'DocumentName',
 		array('name'=>'UserOpen', 'value'=>'$data->RequiredBy'),

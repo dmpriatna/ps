@@ -12,7 +12,28 @@
       <!-- Home tab content
       <div class="tab-pane" id="control-sidebar-home-tab"> -->
   <h4 style="text-align:center; color:#3c8dbc">ADMIN NAVIGATION</h4>
-		<?php
+		<?php		
+		$report = array(
+				'label'=>'<i class="fa fa-files-o"></i><i class="fa fa-angle-left pull-right"></i>Report',
+				'url'=>'#',
+				'itemOptions' => array('class' => 'treeview'),
+				'submenuOptions'=>array('class'=>'treeview-menu'),
+				'items' => array(
+					array(
+						'label' => '<i class="fa fa-circle-o"></i><i class="fa fa-list pull-right"></i>Final Documents',
+						'url' => array('/report/final'),
+					),
+					array(
+						'label' => '<i class="fa fa-circle-o"></i><i class="fa fa-list pull-right"></i>Cancel Documents',
+						'url' => array('/report/cancel'),
+					),
+					array(
+						'label' => '<i class="fa fa-circle-o"></i><i class="fa fa-list pull-right"></i>Budget And Realization',
+						'url' => array('/report/real'),
+					)
+				)
+			);
+
 		$menu=array(
 			array(
 				'label'=>'<i class="fa fa-users"></i><i class="fa fa-angle-left pull-right"></i>Users',
@@ -102,13 +123,13 @@
 					)
 				)
 			),
-			// array('label'=>'<i class="fa fa-th pull-right"></i>Structure Diagram', 'url'=>array('/Site/Page', 'view'=>'dc')),
+			$report,
 		);
 
 		$this->beginWidget('zii.widgets.CPortlet');
 		$this->widget('zii.widgets.CMenu', array(
 			'encodeLabel' => false,
-			'items'=>$menu,
+			'items'=>yii::app()->user->level == "Reader" ? array($report) : $menu,
 			'htmlOptions'=>array('class'=>'sidebar sidebar-menu'),
 		));
 		$this->endWidget();

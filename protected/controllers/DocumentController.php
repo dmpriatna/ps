@@ -200,9 +200,10 @@ class DocumentController extends Controller
 		$userCreate = User::model()->findByAttributes(array('StructureId'=>$role->IdRequiredBy));
 		$IdApprovedBy = array();
 		$ApprovedBy = array();
-		foreach(User::model()->findAllByAttributes(array('StructureId'=>$result[0])) as $value) {
-			$IdApprovedBy[] = $value->Id;
-			$ApprovedBy[] = $value->Name;
+		foreach($result[0] as $value) {
+			$user = User::model()->findByAttributes(array('StructureId'=>$value));
+			$IdApprovedBy[] = $user->Id;
+			$ApprovedBy[] = $user->Name;
 		}
 		$value = array_fill(0, count($IdApprovedBy), 0);
 		$userExecute = User::model()->findByAttributes(array('StructureId'=>$role->IdExecutedBy));
@@ -337,6 +338,7 @@ class DocumentController extends Controller
 		foreach($pict as $value) {
 			if(file_exists(yii::app()->basepath.'\\views\images\\'.$value->Name))
 				unlink(yii::app()->basepath.'\\views\images\\'.$value->Name);
+			$value->delete();
 		}
 
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser

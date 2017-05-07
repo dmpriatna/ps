@@ -133,6 +133,46 @@ class SiteController extends Controller
 		$this->redirect(Yii::app()->homeUrl);
 	}
 
+	public function actionDeleteFile($id)
+	{
+		$pict = Attachment::model()->findByPk($id);
+		if(strtolower($pict->CreatedBy) == yii::app()->user->name){
+			if(file_exists(yii::app()->basepath.'\\views\images\\'.$pict->Name))
+				unlink(yii::app()->basepath.'\\views\images\\'.$pict->Name);
+			$pict->delete();
+			$this->redirect(Yii::app()->user->returnUrl);
+		}
+	}
+
+	public function actionDebugger()
+	{
+		if(yii::app()->user->level == 'Super Admin'){
+			$data = Role::model()->findAll();
+			echo('<pre>');
+			foreach($data as $each){
+				$Name = array();
+				preg_match_all('~[^, ]++~', $each->IdApprovedBy, $IdApprovedBy);
+				preg_match_all('~[^,]++~', $each->ApprovedBy, $ApprovedBy);
+				array_pop($ApprovedBy[0]);
+				print_r($each->Code);
+				echo('<br/>');
+				print_r($ApprovedBy[0]);
+				echo('<br/>');
+				foreach($IdApprovedBy[0] as $value) {
+					$user = User::model()->findByAttributes(array('StructureId'=>$value));
+					if($user != null){
+						$Name[] = $user->Name;
+					}
+				}
+				echo(join(', ', $Name));
+				echo('<hr/>');
+			}
+			echo('</pre>');
+		}
+		else
+			$this->redirect(array('index'));
+	}
+
 	/**
 	 * Initiate the table.
 	 */
