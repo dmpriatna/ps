@@ -42,7 +42,7 @@
 					<?php echo $form->error($model,'Status'); ?>
 				</div>
 			</div>
-			<?php /*<div class="form-group">
+			<div class="form-group">
 				<?php echo $form->labelEx($model,'StructureId',array('class'=>'col-sm-3 control-label')); ?>
 				<div class="col-sm-5">
 					<?php echo $form->dropDownList($model,'StructureId',CHtml::listData(Structure::model()->findAll(),'Id','lookup'),array('class'=>'form-control','prompt'=>'Choose One')); ?>
@@ -50,7 +50,7 @@
 				<div class="col-sm-3">
 					<?php echo $form->error($model,'StructureId'); ?>
 				</div>
-			</div>*/ ?>
+			</div>
 		</div>
 		<!-- /.box-body -->
 		<div class="box-footer">

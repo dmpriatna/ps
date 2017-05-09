@@ -147,25 +147,36 @@ class SiteController extends Controller
 	public function actionDebugger()
 	{
 		if(yii::app()->user->level == 'Super Admin'){
-			$data = Role::model()->findAll();
+			$data = Role::model()->findAll(array('condition'=>'RowStatus = 0', 'order'=>'ModifiedDate DESC'));
 			echo('<pre>');
 			foreach($data as $each){
 				$Name = array();
+				$Error = array();
 				preg_match_all('~[^, ]++~', $each->IdApprovedBy, $IdApprovedBy);
-				preg_match_all('~[^,]++~', $each->ApprovedBy, $ApprovedBy);
-				array_pop($ApprovedBy[0]);
-				print_r($each->Code);
-				echo('<br/>');
-				print_r($ApprovedBy[0]);
-				echo('<br/>');
+				$ApprovedBy = explode(',', $each->ApprovedBy);
+				array_pop($ApprovedBy);
 				foreach($IdApprovedBy[0] as $value) {
 					$user = User::model()->findByAttributes(array('StructureId'=>$value));
 					if($user != null){
 						$Name[] = $user->Name;
+					} else {
+						$Structure = Structure::model()->findByPk($value);
+						if($Structure == null)
+							$Error[] = $value." Bukan StructureId yang Valid";
+						else
+							$Error[] = $Structure->lookup." Tidak Punya User";
 					}
 				}
-				echo(join(', ', $Name));
-				echo('<hr/>');
+				if(count($ApprovedBy) != count($Name)) {
+					echo("ERROR<br>");
+					print_r("Document Code <b>".$each->Code."</b>");
+					echo('<br/>');
+					print_r($IdApprovedBy[0]);
+					print_r($ApprovedBy);
+					print_r($Name);
+					print_r($Error);
+					echo('<hr/>');
+				}
 			}
 			echo('</pre>');
 		}
@@ -332,8 +343,9 @@ class SiteController extends Controller
 			  `Email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
 			  `Password` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
 			  `UniqKey` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
+			  `Phone` varchar(255) NOT NULL,
 			  `Status` enum('Aktif','Tidak Aktif') COLLATE utf8_unicode_ci NOT NULL,
-			  `Level` enum('Super Admin','Admin','User') COLLATE utf8_unicode_ci NOT NULL,
+			  `Level` enum('Super Admin','Admin','User','Reader') COLLATE utf8_unicode_ci NOT NULL,
 			  `StructureId` char(36) COLLATE utf8_unicode_ci NOT NULL,
 			  `CreatedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
 			  `CreatedDate` datetime NOT NULL,
@@ -361,7 +373,7 @@ class SiteController extends Controller
 		if($doc != null) {
 			foreach($doc as $data) {
 				$new->Budget += $data->Budget;
-				$new->SubName .= $data->Code.'; ';
+				$new->SubName .= $data->SubName.'; ';
 				$data->RowStatus = 1;
 				$data->save();
 			}

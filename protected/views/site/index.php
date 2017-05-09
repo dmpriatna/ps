@@ -43,7 +43,7 @@ $userLevel = yii::app()->user->level;
 	'dataProvider'=>$active->active(),
 	'columns'=>array(
 		array('name'  => 'Code',
-			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl("document/view", array("id"=>$data->Id)))',
+			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl(Yii::app()->user->level == "Reader" ? "document/read" : Yii::app()->user->guid ? "document/view" : "document/approve", array("id"=>$data->Id)))',
 			'type'  => 'raw'),
 		'DocumentName',
 		array('name'=>'UserOpen', 'value'=>'$data->RequiredBy'),
@@ -88,7 +88,7 @@ $userLevel = yii::app()->user->level;
 	'dataProvider'=>$process->process(),
 	'columns'=>array(
 		array('name'  => 'Code',
-			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl("document/view", array("id"=>$data->Id)))',
+			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl(Yii::app()->user->level == "Reader" ? "document/read" : "document/view", array("id"=>$data->Id)))',
 			'type'  => 'raw'),
 		'DocumentName',
 		array('name'=>'Position Document', 'value'=>'User::model()->findByPk($data->DocumentStatus) != null ? User::model()->findByPk($data->DocumentStatus)->Name : $data->DocumentStatus'),
@@ -136,7 +136,7 @@ $userLevel = yii::app()->user->level;
 	'dataProvider'=>$execute->exe(),
 	'columns'=>array(
 		array('name'  => 'Code',
-			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl("document/approve", array("id"=>$data->Id)))',
+			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl(Yii::app()->user->level == "Reader" ? "document/read" : "document/approve", array("id"=>$data->Id)))',
 			'type'  => 'raw'),
 		'DocumentName',
 		array('name'=>'UserOpen', 'value'=>'$data->RequiredBy'),
@@ -193,7 +193,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 	'dataProvider'=>$final->execute(),
 	'columns'=>array(
 		array('name'  => 'Code',
-			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl("document/view", array("id"=>$data->Id)))',
+			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl(Yii::app()->user->level == "Reader" ? "document/read" : "document/view", array("id"=>$data->Id)))',
 			'type'  => 'raw'),
 		'DocumentName',
 		array('name'=>'DocumentStatus', 'value'=>'$data->RequiredBy." ( ".$data->DocumentStatus." )"'),

@@ -14,7 +14,7 @@ $this->menu=array(
 	array('label'=>'Delete Document', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->Id),'confirm'=>'Are you sure you want to delete this item?')),
 	array('label'=>'Manage Document', 'url'=>array('admin')),
 );
-$authorize = $model->ApprovalStatus == "Revisi" and $model->DocumentStatus == yii::app()->user->guid ? true : false;
+$authorize = $model->ApprovalStatus == "Revise" and $model->DocumentStatus == yii::app()->user->guid ? true : false;
 ?>
 
 <div class="box box-solid">

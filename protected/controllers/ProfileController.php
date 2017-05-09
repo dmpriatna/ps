@@ -30,6 +30,7 @@ class ProfileController extends Controller
 		if(isset($_POST['User']))
 		{
 			if($_POST['User']['Password'] == $_POST['User']['Pass']) {
+				$_POST['User']['Password'] = md5($_POST['User']['Password'].$model->UniqKey);
 				$model->attributes=$_POST['User'];
 				if($model->save())
 					$this->redirect(array('update','id'=>$model->Id));
@@ -79,6 +80,8 @@ class ProfileController extends Controller
 		{
 			if($model->Password === $_POST['User']['Password']){
 				unset($_POST['User']['Password']);
+			} else {
+				$_POST['User']['Password'] = md5($_POST['User']['Password'].$model->UniqKey);
 			}
 			$model->attributes=$_POST['User'];
 			$profile->attributes=$_POST['Profile'];

@@ -24,7 +24,7 @@ class User extends CActiveRecord
 			array('Status, Level', 'length', 'max'=>11),
 			array('ModifiedDate', 'safe'),
 			array('Name, Email', 'unique'),
-			array('Name, Email, Password, Status, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus', 'safe', 'on'=>'search'),
+			array('Name, Email, Password, Status, Level, StructureId, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -120,7 +120,7 @@ class User extends CActiveRecord
 		}
 		else
 		{
-			$this->Password = md5($this->Password.$this->UniqKey);
+			// $this->Password = md5($this->Password.$this->UniqKey);
 			$this->ModifiedBy = $user;
 			$this->ModifiedDate = $date;
 		}

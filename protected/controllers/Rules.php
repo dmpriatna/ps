@@ -16,7 +16,7 @@
 				$array = array_merge($array,array('add','create','view','approve','pass','reminder'));
 			break;
 			case "Reader" :
-				$array = array_merge($array,array('reminder','final','cancel','real'));
+				$array = array_merge($array,array('reminder','final','cancel','real','view'));
 			break;
 			default :
 				$array = array_merge($array,array());

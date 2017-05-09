@@ -87,15 +87,15 @@ class Role extends CActiveRecord
 		}
 		else
 		{
-			$tail = substr($this->ApprovedBy,0,-2);
-			$rplc = str_replace(", ","\",\"",$tail);
-			$string = "(\"".$rplc."\")";
-			$tempId = array();
-			$struc = Structure::model()->findAll(array('condition'=>'concat(GroupEmployee," ",Division) in '.$string));
-			foreach($struc as $data){
-				$tempId[] = $data->Id;
-			}
-			$this->IdApprovedBy = join(', ', $tempId);
+			// $tail = substr($this->ApprovedBy,0,-2);
+			// $rplc = str_replace(", ","\",\"",$tail);
+			// $string = "(\"".$rplc."\")";
+			// $tempId = array();
+			// $struc = Structure::model()->findAll(array('condition'=>'concat(GroupEmployee," ",Division) in '.$string));
+			// foreach($struc as $data){
+				// $tempId[] = $data->Id;
+			// }
+			// $this->IdApprovedBy = join(', ', $tempId);
 			$this->ModifiedBy = $user;
 			$this->ModifiedDate = $date;
 		}
