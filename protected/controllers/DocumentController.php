@@ -290,7 +290,9 @@ class DocumentController extends Controller
 		} else if(isset($_POST['Document'])) {
 			$model->attributes=$_POST['Document'];
 			$model->ApprovalStatus = NULL;
-			$model->DocumentStatus = explode(",", $model->IdApprovedBy)[0];
+			// $user = User::model()->find(array('condition'=>'Id = "'.explode(",", $model->IdApprovedBy)[0].'"'));
+			// $model->DocumentStatus = $user == null ? "User Can't Find" : $user->Id;
+			$model->DocumentStatus = trim(explode(",", $model->IdApprovedBy)[0]);
 			$trans = Yii::app()->db->beginTransaction();
 			try {
 				if($model->save()) {

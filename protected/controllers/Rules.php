@@ -1,6 +1,6 @@
 <?php
 
-		$array = array('index');
+		$array = array('index','print');
 		switch(yii::app()->user->level)
 		{
 			case "Super Admin" :

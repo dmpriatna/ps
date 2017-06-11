@@ -29,16 +29,31 @@ $('#week').submit(function(){
 echo('
 <div class="box box-solid">
 	<div class="box-body">');
+echo('</div>
+<form id="today" method="post" style="float:left; margin-right:5px">
+<input name="Document[Since]" type="hidden" value="'.date('Y-m-d').'"/>
+<input name="Document[Until]" type="hidden" value="'.date('Y-m-d').'"/>
+<button class="btn btn-primary">Today</button>
+</form>
+<form id="week" method="post">
+<input name="Document[Since]" type="hidden" value="'.date('Y-m-d', strtotime("-1 week")).'"/>
+<input name="Document[Until]" type="hidden" value="'.date('Y-m-d').'"/>
+<button class="btn btn-primary">This Week</button>
+</form>');
+$this->renderPartial('_search',array(
+	'model'=>$model,
+));
 $this->widget('zii.widgets.grid.CGridView', array(
-	'id'=>'active-grid',
-	'dataProvider'=>$model->search(),
+	'id'=>'final-grid',
+	'dataProvider'=>$model->reminder(),
 	'columns'=>array(
 		array('name'  => 'Code',
 			'value' => 'CHtml::link($data->Code, Yii::app()->createUrl("report/view", array("id"=>$data->Id)))',
 			'type'  => 'raw'),
-		// 'Code',
 		'DocumentName',
-		'SubName',
+		'PlanningDate',
+		'Budget',
+		array('name'=>'SubName', 'value'=>'strlen($data->SubName) > 21 ? substr($data->SubName, 0, 20)." . . ." : $data->SubName'),
 		array('name'=>'UserOpen', 'value'=>'$data->RequiredBy'),
 		'CreatedDate',
 		'Priority',

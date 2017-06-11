@@ -41,8 +41,8 @@ $this->renderPartial('_search2',array(
 ));
 echo('</div>
 <form style="float:left; margin-right:5px" id="today" method="post">
-<input name="Document[Since]" type="hidden" value="'.date('Y-m-d').'"/>
-<input name="Document[Until]" type="hidden" value="'.date('Y-m-d').'"/>
+<input name="Document[Since]" type="hidden" value="'.date('Y-m-d', strtotime("-1 day")).'"/>
+<input name="Document[Until]" type="hidden" value="'.date('Y-m-d', strtotime("+1 day")).'"/>
 <button class="btn btn-primary">Today</button>
 </form>
 <form id="week" method="post">
@@ -52,7 +52,7 @@ echo('</div>
 </form>');
 $this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'final-grid',
-	'dataProvider'=>$model->search(),
+	'dataProvider'=>$model->reportFinal(),
 	'columns'=>array(
 		array('name'  => 'No', 'value' => '$this->grid->dataProvider->pagination->offset + $row + 1'),
 		array('name'=>'FinalDate', 'value'=>'$data->finaldate()'),

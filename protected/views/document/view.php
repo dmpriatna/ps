@@ -164,6 +164,20 @@ $authorize = $model->ApprovalStatus == "Revise" and $model->DocumentStatus == yi
 					?>
 				</div>
 			</div>
+			<?php if($model->DocumentStatus != "FINAL") : ?>
+			<div class="panel box box-footer">
+              <form action="<?=Yii::app()->request->baseUrl?>/Document/add" enctype="multipart/form-data" method="post">
+				<label class='col-sm-3 control-label' for='up'>Add File</label>
+				<div class="col-sm-5">
+                  <input name="DocumentId" type="hidden" value="<?=$model->Id?>">
+					<input class='form-control' id='up' multiple='multiple' name='Attachment[UploadedFile][]' type='file' />
+				</div>
+				<div class="col-sm-3">
+					<button class="btn btn-primary pull-right" name='submit' type='submit'>Upload</button>
+				</div>
+              </form>
+			</div>
+			<?php endif; ?>
                     </div>
                   </div>
                 </div>

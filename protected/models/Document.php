@@ -23,8 +23,11 @@ class Document extends CActiveRecord
 			array('Code, DocumentName, SubName, Description, IdRequiredBy, RequiredBy, IdApprovedBy, ApprovedBy, IdExecutedBy, ExecutedBy, ApprovalStatus, DocumentStatus, CreatedBy', 'length', 'max'=>256),
 			array('Id', 'length', 'max'=>36),
 			array('Instruction', 'safe'),
+			
 			array('Code, DocumentName, SubName, Priority, Description, IdRequiredBy, RequiredBy, ApprovedBy, ExecutedBy, Instruction, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus, DocumentStatus, Since, Until', 'safe', 'on'=>'search'),
 			array('Code, DocumentName, SubName, Priority, Description, IdRequiredBy, RequiredBy, ApprovedBy, ExecutedBy, Instruction, CreatedBy, CreatedDate, Id, ModifiedBy, ModifiedDate, RowStatus, DocumentStatus, Since, Until', 'safe', 'on'=>'execute'),
+			array('Code, RowStatus', 'safe', 'on'=>'exe'),
+			array('PlanningDate, RowStatus, Since, Until', 'safe', 'on'=>'reminder'),
 		);
 	}
 
@@ -98,6 +101,37 @@ class Document extends CActiveRecord
 		));
 	}
 	
+	public function reportFinal()
+	{
+		$criteria=new CDbCriteria;
+		$sort = new CSort();
+
+		$criteria->compare('Code',$this->Code,true);
+		$criteria->compare('SubName',$this->SubName,true);
+		$criteria->compare('DocumentStatus','FINAL');
+		$criteria->mergeWith($criteria->addBetweenCondition('ModifiedDate', $this->Since, $this->Until));
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array('defaultOrder'=>'CreatedDate desc')
+		));
+	}
+	
+	public function reminder()
+	{
+		$criteria=new CDbCriteria;
+		$sort = new CSort();
+
+		$criteria->compare('RowStatus',$this->RowStatus);
+		if($this->Since != '' && $this->Until != '')
+			$criteria->condition .= ' AND PlanningDate BETWEEN "'.$this->Since.'" AND "'.$this->Until.'"';
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array('defaultOrder'=>'CreatedDate desc')
+		));
+	}
+	
 	public function active()
 	{
 		$criteria=new CDbCriteria;
@@ -122,6 +156,7 @@ class Document extends CActiveRecord
 
 		$criteria->compare('RowStatus', $this->RowStatus);
 		$criteria->condition = '(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus NOT IN ("'.$user.'","FINAL","CANCEL")';
+		$criteria->condition .= ' AND Code LIKE "'.$this->Code.'%"';
 		$sort->attributes = array('Position Document'=>array('asc'=>'DocumentStatus ASC', 'desc'=>'DocumentStatus DESC'), '*', 'defaultOrder'=>'CreatedDate desc');
 
 		return new CActiveDataProvider($this, array(
@@ -138,13 +173,14 @@ class Document extends CActiveRecord
 
 		$criteria->compare('RowStatus', $this->RowStatus);
 		$criteria->condition = '(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus = "FINAL"';
+		$criteria->condition .= ' AND Code LIKE "'.$this->Code.'%"';
 		if($this->Since != '' && $this->Until != '')
 			$criteria->condition .= ' AND CreatedDate BETWEEN "'.$this->Since.'" AND "'.$this->Until.'"';
 		$sort->attributes = array('defaultOrder'=>'CreatedDate desc');
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
-			'sort'=>$sort
+			'sort'=>array('defaultOrder'=>'ModifiedDate desc')
 		));
 	}
 	
@@ -156,6 +192,7 @@ class Document extends CActiveRecord
 
 		$criteria->compare('RowStatus', $this->RowStatus);
 		$criteria->condition = 'IdExecutedBy = "'.$user.'" AND ApprovalStatus = "Approved"';
+		$criteria->condition .= ' AND Code LIKE "'.$this->Code.'%"';
 		$sort->attributes = array('defaultOrder'=>'CreatedDate desc');
 
 		return new CActiveDataProvider($this, array(
@@ -190,6 +227,11 @@ class Document extends CActiveRecord
 		$minutes = $diff->format("%i minutes");
 		$seconds = $diff->format("%s seconds");
 		return $this->TimeProcess = $days > 0 ? $days : ($hours > 0 ? $hours : ($minutes > 0 ? $minutes : $seconds));
+	}
+
+	public function getLookup()
+	{
+		return explode('-', explode(' ', $this->Code)[0])[1];
 	}
 
 	protected function beforeValidate()

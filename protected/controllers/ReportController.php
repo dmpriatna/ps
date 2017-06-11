@@ -46,7 +46,7 @@ class ReportController extends Controller
 
 	public function actionReminder()
 	{
-		$model = new Document('search');
+		$model = new Document('reminder');
 		$model->RowStatus = 2;
 		if(isset($_REQUEST['Document'])){
 			$model->attributes=$_REQUEST['Document'];
@@ -58,12 +58,17 @@ class ReportController extends Controller
 
 	public function actionFinal()
 	{
-		$model = new Document('search');
-		$model->DocumentStatus = "FINAL";
-		$model->Since = date('Y-m-d', strtotime(date('Y').date('m')."01"));
-		$model->Until = date('Y-m-d');
+		$model = new Document('reportFinal');
 		if(isset($_REQUEST['Document'])){
-			$model->attributes=$_REQUEST['Document'];
+			$model->Since = $_REQUEST['Document']['Since'];
+			setcookie('Since', $_REQUEST['Document']['Since'], time() + 3600);
+			$model->Until = $_REQUEST['Document']['Until'];
+			setcookie('Until', $_REQUEST['Document']['Until'], time() + 3600);
+			$model->Code = $_REQUEST['Document']['Code'];
+			$model->SubName = $_REQUEST['Document']['SubName'];
+		} else {
+			$model->Since = isset($_COOKIE['Since']) ? $_COOKIE['Since'] : date('Y-m-d', strtotime(date('Y').date('m')."01"));
+			$model->Until = isset($_COOKIE['Until']) ? $_COOKIE['Until'] : date('Y-m-d');
 		}
 		$this->render('final',array(
 			'model'=>$model,
@@ -73,11 +78,18 @@ class ReportController extends Controller
 	public function actionCancel()
 	{
 		$model = new Document('search');
-		$model->DocumentStatus = "CANCEL";
-		$model->Since = date('Y-m-d', strtotime(date('Y').date('m')."01"));
-		$model->Until = date('Y-m-d');
 		if(isset($_REQUEST['Document'])){
-			$model->attributes=$_REQUEST['Document'];
+			$model->DocumentStatus = "CANCEL";
+			$model->Since = $_REQUEST['Document']['Since'];
+			setcookie('Since', $_REQUEST['Document']['Since'], time() + 3600);
+			$model->Until = $_REQUEST['Document']['Until'];
+			setcookie('Until', $_REQUEST['Document']['Until'], time() + 3600);
+			$model->Code = $_REQUEST['Document']['Code'];
+			$model->SubName = $_REQUEST['Document']['SubName'];
+		} else {
+			$model->DocumentStatus = "CANCEL";
+			$model->Since = isset($_COOKIE['Since']) ? $_COOKIE['Since'] : date('Y-m-d', strtotime(date('Y').date('m')."01"));
+			$model->Until = isset($_COOKIE['Until']) ? $_COOKIE['Until'] : date('Y-m-d');
 		}
 		$this->render('cancel',array(
 			'model'=>$model,
@@ -87,14 +99,30 @@ class ReportController extends Controller
 	public function actionReal()
 	{
 		$model = new Document('search');
-		$model->DocumentStatus = "FINAL";
-		$model->Since = date('Y-m-d', strtotime(date('Y').date('m')."01"));
-		$model->Until = date('Y-m-d');
 		if(isset($_REQUEST['Document'])){
-			$model->attributes=$_REQUEST['Document'];
+			$model->DocumentStatus = "FINAL";
+			$model->Since = $_REQUEST['Document']['Since'];
+			setcookie('Since', $_REQUEST['Document']['Since'], time() + 3600);
+			$model->Until = $_REQUEST['Document']['Until'];
+			setcookie('Until', $_REQUEST['Document']['Until'], time() + 3600);
+			$model->Code = $_REQUEST['Document']['Code'];
+			$model->SubName = $_REQUEST['Document']['SubName'];
+		} else {
+			$model->DocumentStatus = "FINAL";
+			$model->Since = isset($_COOKIE['Since']) ? $_COOKIE['Since'] : date('Y-m-d', strtotime(date('Y').date('m')."01"));
+			$model->Until = isset($_COOKIE['Until']) ? $_COOKIE['Until'] : date('Y-m-d');
 		}
 		$this->render('real',array(
 			'model'=>$model,
 		));
+	}
+	public function actionPrint()
+	{
+		$dataReportItem = new Document('execute');
+		Yii::app()->request->sendFile('items_periode_.xls',
+			$this->renderPartial('print',array(
+				'dataReportItem' =>$dataReportItem,
+			)
+		),true);                
 	}
 }

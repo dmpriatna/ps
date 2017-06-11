@@ -34,12 +34,12 @@ echo('
 		<div class="panel box box-primary">
 		  <div class="box-header with-border">
 			<h4 class="box-title">
-			  <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+			  <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="setC(this)">
 				Active Document
 			  </a>
 			</h4>
 		  </div>
-		  <div id="collapseOne" class="panel-collapse collapse in">
+		  <div id="collapseOne" class="panel-collapse collapse">
 			<div class="box-body">');
 $this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'active-grid',
@@ -63,7 +63,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 		<div class="panel box box-danger">
 		  <div class="box-header with-border">
 			<h4 class="box-title">
-			  <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+			  <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="setC(this)">
 				Process Document
 			  </a>
 			</h4>
@@ -92,7 +92,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 		<div class="panel box box-success">
 		  <div class="box-header with-border">
 			<h4 class="box-title">
-			  <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+			  <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" onclick="setC(this)">
 				Final Document
 			  </a>
 			</h4>'.
@@ -139,3 +139,37 @@ $this->widget('zii.widgets.grid.CGridView', array(
 </div>');
 
 ?>
+
+<script>
+var c = null;
+var ca = document.cookie.split(';');
+for(var i = 0; i < ca.length; i++) {
+	var ci = ca[i];
+	while (ci.charAt(0) == ' ') {
+		ci = ci.substring(1);
+	}
+	if (ci.indexOf('accordion') == 0) {
+		c = ci.substring(('accordion').length+1, ci.length);
+	}
+}
+switch(c)
+{
+	case "collapseTwo":
+		$('#collapseTwo').addClass('in');
+		break;
+	case "collapseThree":
+		$('#collapseThree').addClass('in');
+		break;
+	default :
+		$('#collapseOne').addClass('in');
+		break;
+}
+function setC(p)
+{
+	var cvalue = p.href.split('#')[1];
+	var d = new Date();
+    d.setTime(d.getTime() + (24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = "accordion=" + cvalue + ";" + expires+ ";path=/";
+}
+</script>

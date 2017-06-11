@@ -52,7 +52,7 @@ $authorize = $model->ApprovalStatus == "Revisi" and $model->DocumentStatus == yi
 			<div class="form-group">
 				<?php echo $form->labelEx($model,'SubName',array('class'=>'col-sm-3 control-label')); ?>
 				<div class="col-sm-5">
-					<?php echo $form->textField($model,'SubName', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
+					<?php echo $form->textArea($model,'SubName', array('class' => 'form-control', 'placeholder'=>'Auto Field', 'readonly'=>true)); ?>
 				</div>
 			</div>
 			<div class="form-group">

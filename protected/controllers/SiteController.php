@@ -45,10 +45,16 @@ class SiteController extends Controller
 			// }
 			$active = new Document('active');
 			$process = new Document('process');
+			if(isset($_REQUEST['Proccess'])){
+				$process->attributes=$_REQUEST['Proccess'];
+			}
 			$final = new Document('execute');
-			$execute = new Document('exe');
 			if(isset($_REQUEST['Document'])){
 				$final->attributes=$_REQUEST['Document'];
+			}
+			$execute = new Document('exe');
+			if(isset($_REQUEST['Executed'])){
+				$execute->attributes=$_REQUEST['Executed'];
 			}
 			$this->render('index', array('active'=>$active, 'process'=>$process, 'execute'=>$execute, 'final'=>$final, 'a'=>count($a), 'p'=>count($p), 'e'=>count($e), 'f'=>count($f)));
 		}
@@ -144,10 +150,40 @@ class SiteController extends Controller
 		}
 	}
 
-	public function actionDebugger()
+
+	public function actionDebugger1()
 	{
 		if(yii::app()->user->level == 'Super Admin'){
 			$data = Role::model()->findAll(array('condition'=>'RowStatus = 0', 'order'=>'ModifiedDate DESC'));
+			echo('<pre>');
+			foreach($data as $each){
+				$Name = array();
+				preg_match_all('~[^, ]++~', $each->IdApprovedBy, $IdApprovedBy);
+				preg_match_all('~[^,]++~', $each->ApprovedBy, $ApprovedBy);
+				array_pop($ApprovedBy[0]);
+				print_r($each->Code);
+				echo('<br/>');
+				print_r($ApprovedBy[0]);
+				foreach($IdApprovedBy[0] as $value) {
+					$user = User::model()->findByAttributes(array('StructureId'=>$value));
+					if($user != null){
+						$Name[] = $user->Name;
+					}
+				}
+				print_r($Name);
+				echo('<hr/>');
+			}
+			echo('</pre>');
+		}
+		else
+			$this->redirect(array('index'));
+	}
+	
+	public function actionDebugger2()
+	{
+		if(yii::app()->user->level == 'Super Admin'){
+			$data = Role::model()->findAll(array('condition'=>'RowStatus = 0', 'order'=>'ModifiedDate DESC'));
+			$Count = 0;
 			echo('<pre>');
 			foreach($data as $each){
 				$Name = array();
@@ -167,7 +203,7 @@ class SiteController extends Controller
 							$Error[] = $Structure->lookup." Tidak Punya User";
 					}
 				}
-				if(count($ApprovedBy) != count($Name)) {
+				if(count($ApprovedBy) != count($Name) or count($IdApprovedBy[0]) != count($ApprovedBy)) {
 					echo("ERROR<br>");
 					print_r("Document Code <b>".$each->Code."</b>");
 					echo('<br/>');
@@ -176,14 +212,47 @@ class SiteController extends Controller
 					print_r($Name);
 					print_r($Error);
 					echo('<hr/>');
+					$Count++;
 				}
 			}
+			echo('<br>');
+			echo($Count == 0 ? "No Data Issue" : $Count);
 			echo('</pre>');
 		}
 		else
 			$this->redirect(array('index'));
 	}
-
+	/*
+	public function actionLoginAs()
+	{
+		throw new CHttpException('Not Available');
+	}
+	*/
+	/*
+	public function actionRepair()
+	{
+		// $data = Document::model()->findAll(array('condition'=>'RowStatus = 2'));
+		$data = Document::model()->findAll(array('condition'=>'RowStatus = 2', 'order'=>'CreatedDate ASC'));
+		$count = 0;
+		foreach($data as $each) {
+			// $tail = substr($each->SubName, 0, -2);
+			// $rplc = str_replace("; ","\",\"",$tail);
+			// $string = "(\"".$rplc."\")";
+			// $desc = array();
+			// $doc = Document::model()->findAll(array('condition'=>'Code IN '.$string));
+			// if($doc != null) {
+				// foreach($doc as $a) {
+					// $desc[] = $a->SubName == "" ? "NULL" : $a->SubName;
+				// }
+				// $each->Description = join('; ', $desc);
+				// $each->save();
+			// }
+			$num = explode('/', $each->Code);
+			$each->Code = sprintf("%s%04s%s",$num[0]."/",++$count,"/".$num[2]."/".$num[3]);
+			$each->save();
+		}
+	}
+	*/
 	/**
 	 * Initiate the table.
 	 */
@@ -240,8 +309,8 @@ class SiteController extends Controller
 			  `IdExecutedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
 			  `ExecutedBy` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
 			  `Budget` bigint(20) NOT NULL,
-			  `PlanningDate` datetime NOT NULL,
 			  `Realization` bigint(20) NOT NULL,
+			  `PlanningDate` datetime NOT NULL,
 			  `RealizationDate` datetime DEFAULT NULL,
 			  `Instruction` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
 			  `ApprovalData` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -368,25 +437,30 @@ class SiteController extends Controller
 	private function Reminder()
 	{
 		$role = Role::model()->find(array('condition'=>'Code = "REMINDER"'));
+		$user = User::model()->find(array('condition'=>'StructureId = "'.$role->ExecutedBy.'"'));
 		$doc = Document::model()->findAll(array('condition'=>'RowStatus = 0 AND DATE(PlanningDate) = CURRENT_DATE() + INTERVAL 1 DAY AND DocumentStatus != "FINAL"'));
 		$new = new Document;
+		$SubName = array();
+		$Description = array();
 		if($doc != null) {
 			foreach($doc as $data) {
 				$new->Budget += $data->Budget;
-				$new->SubName .= $data->SubName.'; ';
+				$SubName[] = $data->Code;
+				$Description[] = $data->SubName;
 				$data->RowStatus = 1;
 				$data->save();
 			}
 			$new->Code = $role->Code.'/'.$role->Number;
 			$new->DocumentName = $role->DocumentName;
+			$new->SubName = join('; ', $SubName);
 			$new->Priority = $role->Priority;
-			$new->Description = $role->Description;
+			$new->Description = join('; ', $Description);
 			$new->IdRequiredBy = '00000000-0000-0000-0000-000000000000';
 			$new->RequiredBy = 'System';
 			$new->IdApprovedBy ='00000000-0000-0000-0000-000000000000';
 			$new->ApprovedBy ='System';
-			$new->IdExecutedBy = $role->IdExecutedBy;
-			$new->ExecutedBy = $role->ExecutedBy;
+			$new->IdExecutedBy = $user->Id;
+			$new->ExecutedBy = $user->Name;
 			$new->PlanningDate = date('Y-m-d');
 			$new->ApprovalData = 'a:1:{s:36:"00000000-0000-0000-0000-000000000000";i:1;}';
 			$new->ApprovalStatus = 'Approved';
@@ -395,7 +469,10 @@ class SiteController extends Controller
 			$new->RowStatus = 2;
 			if($new->save()) {
 				$num = explode("/", $role->Number);
-				$role->Number = sprintf("%04s%s",++$num[0],"/".$num[1]."/".$num[2]);
+				if($num = [1] != date('m'))
+					$role->Number = "0001/".date('m')."/".date('Y');
+				else
+					$role->Number = sprintf("%04s%s",++$num[0],"/".$num[1]."/".$num[2]);
 				$role->save();				
 			}
 		}
