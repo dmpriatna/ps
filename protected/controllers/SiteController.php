@@ -14,7 +14,7 @@ class SiteController extends Controller
 			),
 		);
 	}
-
+	
 	public function actionIndex()
 	{
 		$this->Install();
@@ -25,24 +25,15 @@ class SiteController extends Controller
 		else {
 			$model = Document::model();
 			$user = yii::app()->user->guid;
-			// $level = yii::app()->user->level;
-			// if($level == "Reader"){				
-				// $active = $model->findAll(array('condition'=>'ApprovalStatus IS NULL OR ApprovalStatus = "Revise"'));
-				// $model->unsetAttributes();
-				// $process = $model->findAll(array('condition'=>'ApprovalStatus = "Proccess"'));
-				// $model->unsetAttributes();
-				// $execute = $model->findAll(array('condition'=>'ApprovalStatus = "Approved"'));
-				// $model->unsetAttributes();
-				// $final = $model->findAll(array('condition'=>'ApprovalStatus = "Executed"'));
-			// } else {
-				$a = $model->findAll(array('condition'=>'IdExecutedBy != "'.$user.'" AND DocumentStatus = "'.$user.'"'));
-				$model->unsetAttributes();
-				$p = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus NOT IN ("'.$user.'","FINAL","CANCEL")'));
-				$model->unsetAttributes();
-				$e = $model->findAll(array('condition'=>'IdExecutedBy = "'.$user.'" AND ApprovalStatus = "Approved"'));
-				$model->unsetAttributes();
-				$f = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus = "FINAL"'));
-			// }
+
+			$a = $model->findAll(array('condition'=>'IdExecutedBy != "'.$user.'" AND DocumentStatus = "'.$user.'"'));
+			$model->unsetAttributes();
+			$p = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus NOT IN ("'.$user.'","FINAL","CANCEL")'));
+			$model->unsetAttributes();
+			$e = $model->findAll(array('condition'=>'IdExecutedBy = "'.$user.'" AND ApprovalStatus = "Approved"'));
+			$model->unsetAttributes();
+			$f = $model->findAll(array('condition'=>'(IdRequiredBy = "'.$user.'" OR IdApprovedBy LIKE "%'.$user.'%" OR IdExecutedBy = "'.$user.'") AND DocumentStatus = "FINAL"'));
+
 			$active = new Document('active');
 			$process = new Document('process');
 			if(isset($_REQUEST['Proccess'])){
@@ -70,29 +61,6 @@ class SiteController extends Controller
 				$this->render('error', $error);
 		}
 	}
-
-	// public function actionContact()
-	// {
-		// $model=new ContactForm;
-		// if(isset($_POST['ContactForm']))
-		// {
-			// $model->attributes=$_POST['ContactForm'];
-			// if($model->validate())
-			// {
-				// $name='=?UTF-8?B?'.base64_encode($model->name).'?=';
-				// $subject='=?UTF-8?B?'.base64_encode($model->subject).'?=';
-				// $headers="From: $name <{$model->email}>\r\n".
-					// "Reply-To: {$model->email}\r\n".
-					// "MIME-Version: 1.0\r\n".
-					// "Content-type: text/plain; charset=UTF-8";
-
-				// mail(Yii::app()->params['adminEmail'],$subject,$model->body,$headers);
-				// Yii::app()->user->setFlash('contact','Thank you for contacting us. We will respond to you as soon as possible.');
-				// $this->refresh();
-			// }
-		// }
-		// $this->render('contact',array('model'=>$model));
-	// }
 
 	public function actionLogin()
 	{
@@ -149,7 +117,6 @@ class SiteController extends Controller
 			$this->redirect(Yii::app()->user->returnUrl);
 		}
 	}
-
 
 	public function actionDebugger1()
 	{
@@ -222,37 +189,7 @@ class SiteController extends Controller
 		else
 			$this->redirect(array('index'));
 	}
-	/*
-	public function actionLoginAs()
-	{
-		throw new CHttpException('Not Available');
-	}
-	*/
-	/*
-	public function actionRepair()
-	{
-		// $data = Document::model()->findAll(array('condition'=>'RowStatus = 2'));
-		$data = Document::model()->findAll(array('condition'=>'RowStatus = 2', 'order'=>'CreatedDate ASC'));
-		$count = 0;
-		foreach($data as $each) {
-			// $tail = substr($each->SubName, 0, -2);
-			// $rplc = str_replace("; ","\",\"",$tail);
-			// $string = "(\"".$rplc."\")";
-			// $desc = array();
-			// $doc = Document::model()->findAll(array('condition'=>'Code IN '.$string));
-			// if($doc != null) {
-				// foreach($doc as $a) {
-					// $desc[] = $a->SubName == "" ? "NULL" : $a->SubName;
-				// }
-				// $each->Description = join('; ', $desc);
-				// $each->save();
-			// }
-			$num = explode('/', $each->Code);
-			$each->Code = sprintf("%s%04s%s",$num[0]."/",++$count,"/".$num[2]."/".$num[3]);
-			$each->save();
-		}
-	}
-	*/
+
 	/**
 	 * Initiate the table.
 	 */

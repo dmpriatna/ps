@@ -65,10 +65,14 @@ class ReportController extends Controller
 			$model->Until = $_REQUEST['Document']['Until'];
 			setcookie('Until', $_REQUEST['Document']['Until'], time() + 3600);
 			$model->Code = $_REQUEST['Document']['Code'];
+			setcookie('Code', $_REQUEST['Document']['Code'], time() + 3600);
 			$model->SubName = $_REQUEST['Document']['SubName'];
+			setcookie('SubName', $_REQUEST['Document']['SubName'], time() + 3600);
 		} else {
 			$model->Since = isset($_COOKIE['Since']) ? $_COOKIE['Since'] : date('Y-m-d', strtotime(date('Y').date('m')."01"));
 			$model->Until = isset($_COOKIE['Until']) ? $_COOKIE['Until'] : date('Y-m-d');
+			$model->Code = isset($_COOKIE['Code']) ? $_COOKIE['Code'] : '';
+			$model->SubName = isset($_COOKIE['SubName']) ? $_COOKIE['SubName'] : '';
 		}
 		$this->render('final',array(
 			'model'=>$model,
@@ -85,11 +89,15 @@ class ReportController extends Controller
 			$model->Until = $_REQUEST['Document']['Until'];
 			setcookie('Until', $_REQUEST['Document']['Until'], time() + 3600);
 			$model->Code = $_REQUEST['Document']['Code'];
+			setcookie('Code', $_REQUEST['Document']['Code'], time() + 3600);
 			$model->SubName = $_REQUEST['Document']['SubName'];
+			setcookie('SubName', $_REQUEST['Document']['SubName'], time() + 3600);
 		} else {
 			$model->DocumentStatus = "CANCEL";
 			$model->Since = isset($_COOKIE['Since']) ? $_COOKIE['Since'] : date('Y-m-d', strtotime(date('Y').date('m')."01"));
 			$model->Until = isset($_COOKIE['Until']) ? $_COOKIE['Until'] : date('Y-m-d');
+			$model->Code = isset($_COOKIE['Code']) ? $_COOKIE['Code'] : '';
+			$model->SubName = isset($_COOKIE['SubName']) ? $_COOKIE['SubName'] : '';
 		}
 		$this->render('cancel',array(
 			'model'=>$model,
@@ -106,11 +114,15 @@ class ReportController extends Controller
 			$model->Until = $_REQUEST['Document']['Until'];
 			setcookie('Until', $_REQUEST['Document']['Until'], time() + 3600);
 			$model->Code = $_REQUEST['Document']['Code'];
+			setcookie('Code', $_REQUEST['Document']['Code'], time() + 3600);
 			$model->SubName = $_REQUEST['Document']['SubName'];
+			setcookie('SubName', $_REQUEST['Document']['SubName'], time() + 3600);
 		} else {
 			$model->DocumentStatus = "FINAL";
 			$model->Since = isset($_COOKIE['Since']) ? $_COOKIE['Since'] : date('Y-m-d', strtotime(date('Y').date('m')."01"));
 			$model->Until = isset($_COOKIE['Until']) ? $_COOKIE['Until'] : date('Y-m-d');
+			$model->Code = isset($_COOKIE['Code']) ? $_COOKIE['Code'] : '';
+			$model->SubName = isset($_COOKIE['SubName']) ? $_COOKIE['SubName'] : '';
 		}
 		$this->render('real',array(
 			'model'=>$model,

@@ -113,6 +113,14 @@ class DocumentController extends Controller
 				$history->Subject = $model->Id;
 				$history->Predicate = "Approval";
 				$history->save();
+					$mail = array(
+						'receiver'=>User::model()->findByPk($model->DocumentStatus)->Email,
+						'subject'=>$model->DocumentName,
+						'content'=>'<h1 style="text-align:center">Persetujuan Dokumen</h1>'
+							.'Perihal : '.$model->Description.'<br>'
+							.'Prioritas : '.$model->Priority,
+					);
+					Document::Send($mail);
 				$this->redirect(array('view','id'=>$model->Id));
 			}
 		}
@@ -255,6 +263,14 @@ class DocumentController extends Controller
 					}
 				}
 				$trans->commit();
+					$mail = array(
+						'receiver'=>User::model()->findByPk($model->DocumentStatus)->Email,
+						'subject'=>$model->DocumentName,
+						'content'=>'<h1 style="text-align:center">Dokumen Baru</h1>'
+							.'Perihal : '.$model->Description.'<br>'
+							.'Prioritas : '.$model->Priority,
+					);
+					Document::Send($mail);
 					$this->redirect(array('view','id'=>$model->Id));
 			} catch(Exception $e) {
 				$trans->rollback();
@@ -290,8 +306,6 @@ class DocumentController extends Controller
 		} else if(isset($_POST['Document'])) {
 			$model->attributes=$_POST['Document'];
 			$model->ApprovalStatus = NULL;
-			// $user = User::model()->find(array('condition'=>'Id = "'.explode(",", $model->IdApprovedBy)[0].'"'));
-			// $model->DocumentStatus = $user == null ? "User Can't Find" : $user->Id;
 			$model->DocumentStatus = trim(explode(",", $model->IdApprovedBy)[0]);
 			$trans = Yii::app()->db->beginTransaction();
 			try {
@@ -318,6 +332,14 @@ class DocumentController extends Controller
 						if($attach->save()) move_uploaded_file($value['tmp_name'], $new);
 					}
 					$trans->commit();
+					$mail = array(
+						'receiver'=>User::model()->findByPk($model->DocumentStatus)->Email,
+						'subject'=>$model->DocumentName,
+						'content'=>'<h1 style="text-align:center">Pembaruan Dokumen</h1>'
+							.'Perihal : '.$model->Description.'<br>'
+							.'Prioritas : '.$model->Priority,
+					);
+					Document::Send($mail);
 					$this->redirect(array('view','id'=>$model->Id));
 				}
 			} catch(Exception $e) {

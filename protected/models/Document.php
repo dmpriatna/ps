@@ -234,6 +234,38 @@ class Document extends CActiveRecord
 		return explode('-', explode(' ', $this->Code)[0])[1];
 	}
 
+	public static function Send($data)
+	{
+		Yii::import('application.extensions.phpmailer.JPhpMailer');
+		$receiver = $data['receiver'] !== "" ? $data['receiver'] : false;
+		$subject = $data['subject'] !== "" ? $data['subject'] : false;
+		$content = $data['content'] !== "" ? $data['content'] : false;
+		if($receiver == false || $subject == false || $content == false)
+			return false;
+
+		$mail = new JPhpMailer;
+		$mail->IsSMTP();
+		// $mail->SMTPDebug = 4;
+		$mail->Debugoutput = 'html';
+		$mail->Port = '587';
+		$mail->Host = 'smtp.gmail.com';
+		$mail->SMTPSecure = 'tls';
+		$mail->SMTPAuth = true;
+		$mail->Username = 'paperlessflow@gmail.com';
+		$mail->Password = 'admin@system';
+		$mail->SetFrom('paperlessflow@gmail.com', 'Paperless Flow - Admin');
+		$mail->AddAddress($receiver, '');
+		$mail->Subject = $subject;
+		$mail->MsgHTML($content);
+		$mail->AltBody = 'To view the message, please use an HTML compatible email viewer!';
+		$mail->CharSet = 'utf-8';
+		if (!$mail->send()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	protected function beforeValidate()
 	{
 		parent::beforeValidate();
